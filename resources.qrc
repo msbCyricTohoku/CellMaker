@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resource/Gnome-application-exit.svg.png</file>
+        <file>resource/Gnome-help-contents.svg.png</file>
+        <file>resource/Gnome-utilities-terminal.svg.png</file>
+        <file>resource/Gnome-applications-system.svg.png</file>
+        <file>resource/Gnome-zoom-out.svg.png</file>
+        <file>resource/Gnome-zoom-in.svg.png</file>
+    </qresource>
+</RCC>
