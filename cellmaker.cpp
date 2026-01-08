@@ -281,7 +281,8 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     int containerId = nextId++;
     out << QString("%1  RPP  %2 %3 %2 %3 0 %4")
                .arg(containerId)
-               .arg(-halfGrid).arg(halfGrid)
+               .arg(-halfGrid)
+               .arg(halfGrid)
                .arg(majorZ + bufH) //+5.0 i remove
         << " $ Global Container Box" << Qt::endl;
 
@@ -323,15 +324,15 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
         allExcludedSurfaces += QString(" #%1 #%2").arg(cell.cellSurfId).arg(cell.nucSurfId);
     }
 
-    out << QString("100  3 -1.0  (-%1 %2)").arg(containerId).arg(pz_top) << allExcludedSurfaces
-        << " $ Plate with holes for cells" << Qt::endl;
+    out << QString("3000  2 -1.0  (-%1 %2)").arg(containerId).arg(pz_top) << allExcludedSurfaces << Qt::endl;
 
     //le buffer
-    out << QString("101  8 -0.00129 %1 -%2 -%3 %4 -%5 %6 #100").arg(pz_bottom).arg(pz_top).arg(py_p).arg(py_m).arg(px_p).arg(px_m)
-        << allExcludedSurfaces << " $ Buffer Region" << Qt::endl;
+    out << QString("3001  2 -1.0 %1 -%2 -%3 %4 -%5 %6").arg(pz_bottom).arg(pz_top).arg(py_p).arg(py_m).arg(px_p).arg(px_m) << Qt::endl;
 
+    out << "4001 8 -0.00129 -4000 " << allExcludedSurfaces << " #3000 #3001" << Qt::endl;
     //the void
-    out << "401  0  40 $ External Void" << Qt::endl;
+    out << "4000  -1  4000" << Qt::endl;
+
 
     out << "\n[ E n d ]";
 
@@ -412,13 +413,24 @@ void cellmaker::on_pushButton_clicked()
 
     int midIndex = cellNo / 2;
 
+    double gridWidth = (cellNo - 1) * spacing;
+
+    double totalSpan = (cellNo - 1) * spacing;
+    double halfSpan = totalSpan / 2.0;
+
     for (int i = 0; i < cellNo; ++i) {
         for (int j = 0; j < cellNo; ++j) {
 
+            //this is to fix assymetry issue for even number of cell n^2
+            //double cx = (i * spacing) - (gridWidth / 2.0);
+            //double cy = (j * spacing) - (gridWidth / 2.0);
+
+            double cx = (i * spacing) - halfSpan;
+            double cy = (j * spacing) - halfSpan;
             // calculate Centered Coordinates
             // This ensures the central cell (i=midIndex, j=midIndex) is at 0,0
-            double cx = (i - midIndex) * spacing;
-            double cy = (j - midIndex) * spacing;
+           // double cx = (i - midIndex) * spacing;
+           // double cy = (j - midIndex) * spacing;
             double cz = 0.0;
 
             // draw Cytoplasm in QGraphicsScene
@@ -447,9 +459,9 @@ void cellmaker::on_pushButton_clicked()
             CompleteCell cc;
 
             //cytoplasm center (Grid)
-            cc.x = (i - midIndex) * spacing;
-            cc.y = (j - midIndex) * spacing;
-            cc.z = 0.0; // Base of the semi-ellipsoid
+            cc.x = cx; //(i - midIndex) * spacing;
+            cc.y = cy; //(j - midIndex) * spacing;
+            cc.z = cz; //0.0; // Base of the semi-ellipsoid
             cc.rx = cellSize / 2.0;
             cc.rz = majorZ; // Height of the cell
             cc.majorX = majorX;
