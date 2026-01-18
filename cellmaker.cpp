@@ -276,7 +276,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     //next id
     int nextId = (totalCells * 2) + 1;
 
-    //global Container Box / Plate
+    //global Container Box / Plateq
     double halfGrid = (cells.last().x) + (cells.first().rx + 20.0);
     int containerId = nextId++;
     out << QString("%1  RPP  %2 %3 %2 %3 0 %4")
@@ -304,6 +304,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << "\n[ C e l l ]" << Qt::endl;
 
     QString allExcludedSurfaces = "";
+    QString domainsREG = "";
 
     //nuc and cyto pairs
     for (const auto& cell : cells) {
@@ -322,6 +323,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
 
         //build a string of all cell/nuc IDs to subtract them from the container
         allExcludedSurfaces += QString(" #%1 #%2").arg(cell.cellSurfId).arg(cell.nucSurfId);
+        domainsREG +=  QString(" %1 %2").arg(cell.cellSurfId).arg(cell.nucSurfId);
     }
 
     out << QString("3000  2 -1.0  (-%1 %2)").arg(containerId).arg(pz_top) << allExcludedSurfaces << Qt::endl;
@@ -332,6 +334,81 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << "4001 8 -0.00129 -4000 " << allExcludedSurfaces << " #3000 #3001" << Qt::endl;
     //the void
     out << "4000  -1  4000" << Qt::endl;
+
+
+    out << "\n[ T - Gshow ]" << Qt::endl;
+    out << "title = generated cell array" << Qt::endl;
+    out << "mesh =  xyz" << Qt::endl;
+    out << "x-type = 2" << Qt::endl;
+    out << "xmin = " << -halfGrid << Qt::endl;
+    out << "xmax = " <<  halfGrid << Qt::endl;
+    out << "nx = 200" << Qt::endl;
+    out << "y-type = 2" << Qt::endl;
+    out << "ymin = " << -halfGrid << Qt::endl;
+    out << "ymax = " << halfGrid << Qt::endl;
+    out << "ny = 200" << Qt::endl;
+    out << " z-type = 1" << Qt::endl;
+    out << "nz = 1" << Qt::endl;
+    out << "0.000 " << majorZ+bufH << Qt::endl;
+    out << "axis = xy" << Qt::endl;
+    out << "file = geometry_topview.out" << Qt::endl;
+    out << "output = 6" << Qt::endl;
+    out << "epsout = 1" << Qt::endl;
+
+  out << "\n[ T - Deposit ]" << Qt::endl;
+    out << "title = dose on cell array" << Qt::endl;
+    out << "mesh =  xyz" << Qt::endl;
+    out << "x-type = 2" << Qt::endl;
+    out << "xmin = " << -halfGrid << Qt::endl;
+    out << "xmax = " <<  halfGrid << Qt::endl;
+    out << "nx = 200" << Qt::endl;
+    out << "y-type = 2" << Qt::endl;
+    out << "ymin = " << -halfGrid << Qt::endl;
+    out << "ymax = " << halfGrid << Qt::endl;
+    out << "ny = 200" << Qt::endl;
+    out << " z-type = 1" << Qt::endl;
+    out << "nz = 1" << Qt::endl;
+    out << "0.000 " << majorZ+bufH << Qt::endl;
+    out << "axis = xy" << Qt::endl;
+    out << "file = top_view_deposit.out" << Qt::endl;
+    out << "part = all" << Qt::endl;
+    out << "material = all" << Qt::endl;
+    out << "output = dose" << Qt::endl;
+    out << "unit = 2" << Qt::endl;
+    out << "epsout = 1" << Qt::endl;
+
+
+    out << Qt::scientific;
+    out.setRealNumberPrecision(3); // good enough for cells in micron range since will be written as cm
+
+  out << "\n[ T - Deposit ]" << Qt::endl;
+    out << "title = dose in cell constituents" << Qt::endl;
+    out << "mesh = reg" << Qt::endl;
+    out << "reg = " << domainsREG << Qt::endl;
+    out << "volume" << Qt::endl;
+    out << "reg      vol" << Qt::endl;
+
+    for (const auto& cell : cells) {
+        //out << cell.cellSurfId << "   " << M_PI*(2/3)*(cell.nrx*cell.nrx*cell.nrz) << Qt::endl;
+        //out << cell.nucSurfId  << "   " << M_PI*(2/3)*(cell.rx*cell.rx*cell.rz) << Qt::endl;
+
+
+        double nucVol  = M_PI * (4.0 / 3.0) * (cell.nrx * cell.nrx * cell.nrz);
+        double cellVol = M_PI * (2.0 / 3.0) * (cell.rx * cell.rx * cell.rz) - nucVol; //to be precise remove out volume of nucleus from cytoplasm
+
+        out << cell.cellSurfId << "   " << cellVol << Qt::endl;
+        out << cell.nucSurfId  << "   " << nucVol  << Qt::endl;
+
+    }
+
+    out << "axis = reg" << Qt::endl;
+    out << "file = dose_cells.out" << Qt::endl;
+    out << "unit = 0" << Qt::endl;
+    out << "part = photon neutron proton alpha" << Qt::endl;
+    out << "material = all" << Qt::endl;
+    out << "output = dose" << Qt::endl;
+    out << "epsout = 0" << Qt::endl;
+
 
 
     out << "\n[ E n d ]";
