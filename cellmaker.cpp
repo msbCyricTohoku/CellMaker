@@ -191,15 +191,15 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << "8000 -88.9\n" << Qt::endl;
 
     out << "mat[3] $BONE-CORTICAL(ICRU-44)" << Qt::endl;
-    out << "1000 -4.7" << Qt::endl;
-    out << "6000 -14.4" << Qt::endl;
+    out << "1000 -3.4" << Qt::endl;
+    out << "6000 -15.5" << Qt::endl;
     out << "7000 -4.2" << Qt::endl;
-    out << "8000 -44.6" << Qt::endl;
+    out << "8000 -43.5" << Qt::endl;
     out << "11000 -0.1" << Qt::endl;
     out << "12000 -0.2" << Qt::endl;
-    out << "15000 -10.5" << Qt::endl;
+    out << "15000 -10.3" << Qt::endl;
     out << "16000 -0.3" << Qt::endl;
-    out << "20000 -20.9\n" << Qt::endl;
+    out << "20000 -22.5\n" << Qt::endl;
 
     out << "mat[4] $ADIPOSE-TISSUE" << Qt::endl;
     out << "1000 -11.4" << Qt::endl;
@@ -219,22 +219,23 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << "20000 -1.9\n" << Qt::endl;
 
     out << "mat[6] $B-100-PLASTIC" << Qt::endl;
-    out << "1000 -6.5" << Qt::endl;
+    out << "1000 -6.6" << Qt::endl;
     out << "6000 -53.7" << Qt::endl;
     out << "7000 -2.1" << Qt::endl;
-    out << "8000 -4.4" << Qt::endl;
-    out << "9000 -1.5" << Qt::endl;
-    out << "20000 -31.8\n" << Qt::endl;
+    out << "8000 -3.2" << Qt::endl;
+    out << "9000 -16.7" << Qt::endl;
+    out << "20000 -17.7\n" << Qt::endl;
 
     out << "mat[7] $MUSCLE-SKELETAL" << Qt::endl;
     out << "1000 -10.2" << Qt::endl;
-    out << "6000 -12.3" << Qt::endl;
-    out << "7000 -3.5" << Qt::endl;
-    out << "8000 -72.9" << Qt::endl;
+    out << "6000 -14.3" << Qt::endl;
+    out << "7000 -3.4" << Qt::endl;
+    out << "8000 -71.0" << Qt::endl;
     out << "11000 -0.1" << Qt::endl;
     out << "15000 -0.2" << Qt::endl;
-    out << "16000 -0.5" << Qt::endl;
-    out << "19000 -0.3\n" << Qt::endl;
+    out << "16000 -0.3" << Qt::endl;
+    out << "17000 -0.1" << Qt::endl;
+    out << "19000 -0.4\n" << Qt::endl;
 
     out << "mat[8] $AIR-DRY-NIST" << Qt::endl;
     out << "6000 -0.0124" << Qt::endl;
