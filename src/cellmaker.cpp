@@ -548,34 +548,95 @@ void cellmaker::on_pushButton_clicked()
     double totalSpan = (cellNo - 1) * spacing;
     double halfSpan = totalSpan / 2.0;
 
-    for (int i = 0; i < cellNo; ++i) {
-        for (int j = 0; j < cellNo; ++j) {
+    QString cytoplasmType = ui->comboBox->currentText();
+    double userRadius   = 100; //ui->spinBoxRandomRadius->value();   // radius within which cells may be displaced
+    const int maxAttempts = 1000;                           // safety limit for placement tries
+    QVector<QPointF> placedCenters;                         // stores already‑placed cell centres
+    bool placementOk = true;                                // will become false if we cannot place a cell
 
-            //this is to fix assymetry issue for even number of cell n^2
+    for (int i = 0; i < cellNo && placementOk; ++i) {
+        for (int j = 0; j < cellNo && placementOk; ++j) {
+            //to fix assymetry issue for even number of cell n^2
             //double cx = (i * spacing) - (gridWidth / 2.0);
             //double cy = (j * spacing) - (gridWidth / 2.0);
+            double baseCx = (i * spacing) - halfSpan;
+            double baseCy = (j * spacing) - halfSpan;
 
-            double cx = (i * spacing) - halfSpan;
-            double cy = (j * spacing) - halfSpan;
+
             // calculate Centered Coordinates
-            // This ensures the central cell (i=midIndex, j=midIndex) is at 0,0
-           // double cx = (i - midIndex) * spacing;
-           // double cy = (j - midIndex) * spacing;
+            //this ensures the central cell (i=midIndex, j=midIndex) is at 0,0
+            // double cx = (i - midIndex) * spacing;
+            // double cy = (j - midIndex) * spacing;
             double cz = 0.0;
 
+            //randomize cells aka cytos
+            double cx = baseCx;
+            double cy = baseCy;
+
+            if (cytoplasmType == "Random") {
+                int attempts = 0;
+                bool placed   = false;
+
+                while (attempts < maxAttempts && !placed) {
+                    // pick a random direction
+                    double thetaPos = 2.0 * M_PI * generator->generateDouble();
+                    // pick a random distance that stays inside the user‑defined radius
+                    double rPos = userRadius * std::sqrt(generator->generateDouble());
+                    // candidate centre
+                    double candCx = baseCx + rPos * std::cos(thetaPos);
+                    double candCy = baseCy + rPos * std::sin(thetaPos);
+
+                    //------- check overlap with all previously placed cells -----------------
+                    bool overlap = false;
+                    for (const QPointF &p : placedCenters) {
+                        double dx = candCx - p.x();
+                        double dy = candCy - p.y();
+                        // each cell radius = cellSize/2, so sum of radii = cellSize
+                        if (std::hypot(dx, dy) < cellSize) {
+                            overlap = true;
+                            break;
+                        }
+                    }
+                    //---------------------------------------------------------------------
+
+                    if (!overlap) {
+                        cx = candCx;
+                        cy = candCy;
+                        placed = true;
+                        placedCenters.append(QPointF(cx, cy));
+                    }
+                    ++attempts;
+                }
+
+                if (!placed) {
+                    ui->textBrowser->setText(
+                        tr("Error: Unable to place cells without overlap within the given radius."));
+                    placementOk = false;
+                    break;          // break inner loop; outer loop will also stop because placementOk==false
+                }
+            } else {
+                // no random displacement – keep the regular grid position
+                placedCenters.append(QPointF(cx, cy));
+            }
+
             // draw Cytoplasm in QGraphicsScene
-            // Note: We subtract cellSize/2.0 to define the top-left corner for Qt
-            QRectF cellRect(cx - cellSize / 2.0, cy - cellSize / 2.0, cellSize, cellSize);
+            // Note: We subtract cellSize/2.0 to define the top‑left corner for Qt
+            QRectF cellRect(cx - cellSize / 2.0,
+                            cy - cellSize / 2.0,
+                            cellSize,
+                            cellSize);
             scene->addEllipse(cellRect, cellOutline, cellFill);
 
             //calculate and Draw Nucleus (Random Position inside cell)
             double theta = 2.0 * M_PI * generator->generateDouble();
-            double r = (cellSize / 2.0 - nucleusSize / 2.0) * sqrt(generator->generateDouble());
-
-            double nx = cx + r * cos(theta);
-            double ny = cy + r * sin(theta);
-
-            QRectF nucleusRect(nx - nucleusSize / 2.0, ny - nucleusSize / 2.0, nucleusSize, nucleusSize);
+            double r = (cellSize / 2.0 - nucleusSize / 2.0) *
+                       std::sqrt(generator->generateDouble());
+            double nx = cx + r * std::cos(theta);
+            double ny = cy + r * std::sin(theta);
+            QRectF nucleusRect(nx - nucleusSize / 2.0,
+                               ny - nucleusSize / 2.0,
+                               nucleusSize,
+                               nucleusSize);
             scene->addEllipse(nucleusRect, nucleusOutline, nucleusFill);
 
             // data for cell cytoplasm
@@ -586,69 +647,61 @@ void cellmaker::on_pushButton_clicked()
             //c.rx = cellSize / 2.0; // radius of minor axis
             //c.rz = majorZ;         // major axis vector magnitude (vertical height)
             //cellList.append(c);
-            CompleteCell cc;
 
+
+            CompleteCell cc;
             //cytoplasm center (Grid)
             cc.x = cx; //(i - midIndex) * spacing;
             cc.y = cy; //(j - midIndex) * spacing;
-            cc.z = cz; //0.0; // Base of the semi-ellipsoid
+            cc.z = cz; //0.0; // Base of the semi‑ellipsoid
             cc.rx = cellSize / 2.0;
-            cc.rz = majorZ; // Height of the cell
+            cc.rz = majorZ;          // Height of the cell
             cc.majorX = majorX;
             cc.majorY = majorY;
-
             //the following was simple check, issue is cell shape is complex
             //it when nucleus moves up the dome it can fall outside
+
+
             /*
-            //random nuclues pos.
-            //calculate a safe radius for the nucleus center so it doesn't hit the side walls
-            double maxLateralOffset = cc.rx - (nucleusSize / 2.0) - 0.00001; // Subtract small epsilon for safety
-            theta = 2.0 * M_PI * generator->generateDouble();
-            r = maxLateralOffset * sqrt(generator->generateDouble());
-
-            cc.nx = cc.x + r * cos(theta);
-            cc.ny = cc.y + r * sin(theta);
-
-            // a safe Z height
-            // To keep it inside a semi-ellipsoid, we must ensure it doesn't hit the "dome"
-            // For a sphere-like nucleus, we place it in the lower-middle half:
-            cc.nrz = nucleusSize / 4.0; // Example vertical radius
-            cc.nrx = nucleusSize / 2.0; // Horizontal radius
-
-            // Place nz such that it is always above z=0 and below the dome height
-            cc.nz = cc.nrz + (cc.rz * 0.5 * generator->generateDouble());
-            */
+        //random nuclues pos.
+        //calculate a safe radius for the nucleus center so it doesn't hit the side walls
+        double maxLateralOffset = cc.rx - (nucleusSize / 2.0) - 0.00001; // Subtract small epsilon for safety
+        theta = 2.0 _M_PI_ generator->generateDouble();
+        r = maxLateralOffset * sqrt(generator->generateDouble());
+        cc.nx = cc.x + r * cos(theta);
+        cc.ny = cc.y + r * sin(theta);
+        // a safe Z height
+        // To keep it inside a semi-ellipsoid, we must ensure it doesn't hit the "dome"
+        // For a sphere‑like nucleus, we place it in the lower‑middle half:
+        cc.nrz = nucleusSize / 4.0; // Example vertical radius
+        cc.nrx = nucleusSize / 2.0; // Horizontal radius
+        // Place nz such that it is always above z=0 and below the dome height
+        cc.nz = cc.nrz + (cc.rz _0.5_ generator->generateDouble());
+        */
 
             cc.nrx = nucleusSize / 2.0;
             cc.nrz = nucleusSize / 4.0; // Example: Nucleus is flatter than cell
-
             //safe Z for the nucleus
             //above 0 + nrz and below cell height - nrz
             double minNz = cc.nrz + 0.000001;
             double maxNz = cc.rz - cc.nrz - 0.000001;
             cc.nz = minNz + (maxNz - minNz) * generator->generateDouble();
-
             //safe lateral (XY) offset at this height
             //based on ellipsoid eq: localRx = rx * sqrt(1 - (nz/rz)^2)
-            double localCellRx = cc.rx * std::sqrt(1.0 - std::pow(cc.nz / cc.rz, 2));
+            double localCellRx = cc.rx *
+                                 std::sqrt(1.0 - std::pow(cc.nz / cc.rz, 2));
             double maxLateralOffset = localCellRx - cc.nrx - 0.000001;
-
             if (maxLateralOffset < 0) maxLateralOffset = 0; // Safety for very small cells
-
             theta = 2.0 * M_PI * generator->generateDouble();
             r = maxLateralOffset * std::sqrt(generator->generateDouble());
-
             cc.nx = cc.x + r * std::cos(theta);
             cc.ny = cc.y + r * std::sin(theta);
-
             // Assign IDs
             cc.cellSurfId = cellList.size() + 1;
-            cc.nucSurfId = cc.cellSurfId + (cellNo * cellNo);
-
+            cc.nucSurfId  = cc.cellSurfId + (cellNo * cellNo);
             cellList.append(cc);
         }
     }
-
 
     QString bufHString = ui->lineEdit_2->text();
 
