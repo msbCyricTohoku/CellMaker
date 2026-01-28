@@ -128,7 +128,7 @@ void cellmaker::on_pushButton_6_clicked()
 
 void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const QString &maxbch, const QString sourceType,
                     const QString proj, const QString r0, const QString z0, const QString e0,
-                         QList<CompleteCell> cells, double bufH, double majorZ)
+                         QList<CompleteCell> cells, double bufH,double majorZ,int cytoMatNo,int nucMatNo,int buffMatNo)
 {
     QFile f(path);
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
@@ -307,16 +307,46 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     QString allExcludedSurfaces = "";
     QString domainsREG = "";
 
+    double Cytodensity=0.0;
+    double Nucdensity=0.0;
+    double Bufdensity = 0.0;
+    double Airdensity = -0.00129;
+    static const double densities[] = {1.06, 1.00, 1.92, 0.95, 1.127, 1.45, 1.05};
+    const int num_materials = sizeof(densities) / sizeof(densities[0]);
+
+    //qDebug() << num_materials << Qt::endl;
+
+    if (cytoMatNo >= 0 && cytoMatNo < num_materials) {
+        Cytodensity = densities[cytoMatNo];
+    }
+
+    if (nucMatNo >= 0 && nucMatNo < num_materials) {
+        Nucdensity = densities[nucMatNo];
+    }
+
+    if (buffMatNo >= 0 && buffMatNo < num_materials) {
+        Bufdensity = densities[buffMatNo];
+    }
+
+
+
+
     //nuc and cyto pairs
     for (const auto& cell : cells) {
         //nucleus Cell: Material 2 (Inside nucleus surface)
-        out << QString("%1  2 -1.27  -%2").arg(cell.nucSurfId, -3).arg(cell.nucSurfId)
+        out << QString("%1  %2 -%3  -%4")
+                   .arg(cell.nucSurfId, -3)
+                   .arg(nucMatNo+1)
+                   .arg(Nucdensity)
+                   .arg(cell.nucSurfId)
             << " $nucleus" << Qt::endl;
 
         //cytoplasm Cell: Material 1 (Inside cell surface AND above plane, but NOT inside nucleus)
         // Syntax: (-cellSurf pz_top) #nucSurf
-        out << QString("%1  1 -1.127 (-%2 %3) #%4")
+        out << QString("%1  %2 -%3 (-%4 %5) #%6")
                    .arg(cell.cellSurfId, -3)
+                   .arg(cytoMatNo+1)
+                   .arg(Cytodensity)
                    .arg(cell.cellSurfId)
                    .arg(pz_top)
                    .arg(cell.nucSurfId)
@@ -327,12 +357,24 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
         domainsREG +=  QString(" %1 %2").arg(cell.cellSurfId).arg(cell.nucSurfId);
     }
 
-    out << QString("3000  2 -1.0  (-%1 %2)").arg(containerId).arg(pz_top) << allExcludedSurfaces << Qt::endl;
+    out << QString("3000  %1 -%2  (-%3 %4)")
+               .arg(buffMatNo+1)
+               .arg(Bufdensity)
+               .arg(containerId)
+               .arg(pz_top) << allExcludedSurfaces << Qt::endl;
 
     //le buffer
-    out << QString("3001  2 -1.0 %1 -%2 -%3 %4 -%5 %6").arg(pz_bottom).arg(pz_top).arg(py_p).arg(py_m).arg(px_p).arg(px_m) << Qt::endl;
+    out << QString("3001  %1 -%2 %3 -%4 -%5 %6 -%7 %8")
+               .arg(buffMatNo+1)
+               .arg(Bufdensity)
+               .arg(pz_bottom)
+               .arg(pz_top)
+               .arg(py_p)
+               .arg(py_m)
+               .arg(px_p)
+               .arg(px_m) << Qt::endl;
 
-    out << "4001 8 -0.00129 -4000 " << allExcludedSurfaces << " #3000 #3001" << Qt::endl;
+    out << "4001 " << num_materials+1 << " " << Airdensity <<" -4000 " << allExcludedSurfaces << " #3000 #3001" << Qt::endl;
     //the void
     out << "4000  -1  4000" << Qt::endl;
 
@@ -457,6 +499,16 @@ void cellmaker::on_pushButton_clicked()
 
     //ui->textBrowser->insertPlainText(sourceType);
 
+    int cytoMatNo = ui->comboBox_4->currentIndex();
+
+   //qDebug() << matNo << Qt::endl;
+
+    int nucMatNo = ui->comboBox_5->currentIndex();
+    int buffMatNo = ui->comboBox_6->currentIndex();
+    //int airMatNo = ui->comboBox_7->currentIndex();
+
+
+
 
     //int cellNo = 3;
     //double cellSize = 80.0;  //diameter of each cell
@@ -473,7 +525,7 @@ void cellmaker::on_pushButton_clicked()
    // QList<CellData> cellList;
     //int cellCounter = 1;
     QList<CompleteCell> cellList;
-    int totalCells = cellNo * cellNo;
+    //int totalCells = cellNo * cellNo;
     QString majorZString = ui->lineEdit_5->text();
 
     QString majorXString = ui->lineEdit_3->text();
@@ -486,12 +538,12 @@ void cellmaker::on_pushButton_clicked()
 
     const double majorY = majorYString.toDouble();
 
-    double totalGridSize = (cellNo - 1) * spacing;
-    double offset = totalGridSize / 2.0;
+    //double totalGridSize = (cellNo - 1) * spacing;
+   // double offset = totalGridSize / 2.0;
 
-    int midIndex = cellNo / 2;
+    //int midIndex = cellNo / 2;
 
-    double gridWidth = (cellNo - 1) * spacing;
+    //double gridWidth = (cellNo - 1) * spacing;
 
     double totalSpan = (cellNo - 1) * spacing;
     double halfSpan = totalSpan / 2.0;
@@ -637,7 +689,7 @@ void cellmaker::on_pushButton_clicked()
      //ui->textBrowser->insertPlainText(sourceType);
 
 
-phitsScriptGen("input.i", maxcas,maxbch,sourceType,proj,r0,z0,e0,cellList, bufH, majorZ);
+phitsScriptGen("input.i", maxcas,maxbch,sourceType,proj,r0,z0,e0,cellList,bufH, majorZ,cytoMatNo,nucMatNo,buffMatNo);
 
 
 }
