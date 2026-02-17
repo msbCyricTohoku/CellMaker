@@ -21,7 +21,7 @@
   $ make
 
   [ USAGE ]
-  $ ./cellmaker
+  $ ./PHITSCellMaker
 
   [ STATUS ]
   Active // Open Source
