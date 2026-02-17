@@ -40,7 +40,7 @@ cellmaker::cellmaker(QWidget *parent)
     ui->lineEdit_5->setText("20");
 
     ui->checkBox_3->setChecked(true);
-    ui->checkBox_4->setChecked(true);
+//    ui->checkBox_4->setChecked(true);
 
 ui->lineEdit_3->setText("0");
 
@@ -379,6 +379,8 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << "4000  -1  4000" << Qt::endl;
 
 
+    if(ui->checkBox_3->isChecked()){
+
     out << "\n[ T - Gshow ]" << Qt::endl;
     out << "title = generated cell array" << Qt::endl;
     out << "mesh =  xyz" << Qt::endl;
@@ -397,6 +399,16 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << "file = geometry_topview.out" << Qt::endl;
     out << "output = 6" << Qt::endl;
     out << "epsout = 1" << Qt::endl;
+    }
+
+    if(ui->checkBox_2->isChecked()){
+        out << "\n[ T - Track ]" << Qt::endl;
+
+        to be completed hehe
+
+    }
+
+    if(ui->checkBox->isChecked()){
 
   out << "\n[ T - Deposit ]" << Qt::endl;
     out << "title = dose on cell array" << Qt::endl;
@@ -452,7 +464,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << "output = dose" << Qt::endl;
     out << "epsout = 0" << Qt::endl;
 
-
+    }
 
     out << "\n[ E n d ]";
 
@@ -462,6 +474,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
 
 void cellmaker::on_pushButton_clicked()
 {
+    ui->textBrowser->setText("");
     QGraphicsScene *scene = new QGraphicsScene();
 
     ui->graphicsView->setScene(scene);
@@ -549,7 +562,7 @@ void cellmaker::on_pushButton_clicked()
     double halfSpan = totalSpan / 2.0;
 
     QString cytoplasmType = ui->comboBox->currentText();
-    double userRadius   = 100; //ui->spinBoxRandomRadius->value();   // radius within which cells may be displaced
+    double userRadius   = ui->spinBoxRandomRadius->value();   // radius within which cells may be displaced
     const int maxAttempts = 1000;                           // safety limit for placement tries
     QVector<QPointF> placedCenters;                         // stores already‑placed cell centres
     bool placementOk = true;                                // will become false if we cannot place a cell
@@ -581,7 +594,7 @@ void cellmaker::on_pushButton_clicked()
                     // pick a random direction
                     double thetaPos = 2.0 * M_PI * generator->generateDouble();
                     // pick a random distance that stays inside the user‑defined radius
-                    double rPos = userRadius * std::sqrt(generator->generateDouble());
+                    double rPos = userRadius * std::sqrt(generator->generateDouble()); //sqrt will give non-uniform distb.values close to 1 than 0
                     // candidate centre
                     double candCx = baseCx + rPos * std::cos(thetaPos);
                     double candCy = baseCy + rPos * std::sin(thetaPos);
@@ -617,6 +630,7 @@ void cellmaker::on_pushButton_clicked()
             } else {
                 // no random displacement – keep the regular grid position
                 placedCenters.append(QPointF(cx, cy));
+
             }
 
             // draw Cytoplasm in QGraphicsScene
