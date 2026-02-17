@@ -403,8 +403,28 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
 
     if(ui->checkBox_2->isChecked()){
         out << "\n[ T - Track ]" << Qt::endl;
-
-        to be completed hehe
+        out << "title = track on cell array" << Qt::endl;
+        out << "mesh =  xyz" << Qt::endl;
+        out << "x-type = 2" << Qt::endl;
+        out << "xmin = " << -halfGrid << Qt::endl;
+        out << "xmax = " <<  halfGrid << Qt::endl;
+        out << "nx = 200" << Qt::endl;
+        out << "y-type = 2" << Qt::endl;
+        out << "ymin = " << -halfGrid << Qt::endl;
+        out << "ymax = " << halfGrid << Qt::endl;
+        out << "ny = 200" << Qt::endl;
+        out << " z-type = 1" << Qt::endl;
+        out << "nz = 1" << Qt::endl;
+        out << "0.000 " << majorZ+bufH << Qt::endl;
+        out << "axis = xy" << Qt::endl;
+        out << "file = tracks.out" << Qt::endl;
+        out << "e-type = 3" << Qt::endl;
+        out << "emin = 1.0E-3" << Qt::endl;
+        out << "emax = " << e0 << Qt::endl;
+        out << "ne = 1" << Qt::endl;
+        out << "part = all" << Qt::endl;
+        out << "material = all" << Qt::endl;
+        out << "epsout = 1" << Qt::endl;
 
     }
 
@@ -756,7 +776,7 @@ void cellmaker::on_pushButton_clicked()
      //ui->textBrowser->insertPlainText(sourceType);
 
 
-phitsScriptGen("input.i", maxcas,maxbch,sourceType,proj,r0,z0,e0,cellList,bufH, majorZ,cytoMatNo,nucMatNo,buffMatNo);
+phitsScriptGen("gen/input.i", maxcas,maxbch,sourceType,proj,r0,z0,e0,cellList,bufH, majorZ,cytoMatNo,nucMatNo,buffMatNo);
 
 
 }
