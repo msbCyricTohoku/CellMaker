@@ -20,6 +20,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
+#include <QProcess>
 
 cellmaker::cellmaker(QWidget *parent)
     : QMainWindow(parent)
@@ -39,6 +40,8 @@ cellmaker::cellmaker(QWidget *parent)
 
     ui->lineEdit_5->setText("20");
 
+    ui->checkBox->setChecked(true);
+    ui->checkBox_2->setChecked(true);
     ui->checkBox_3->setChecked(true);
 //    ui->checkBox_4->setChecked(true);
 
@@ -826,5 +829,30 @@ void cellmaker::on_actionZoom_triggered()
 void cellmaker::on_actionZoom_2_triggered()
 {
     on_pushButton_6_clicked();
+}
+
+
+void cellmaker::on_pushButton_2_clicked()
+{
+    QProcess *process = new QProcess(this);
+
+
+    QString genPath = qApp->applicationDirPath() + "/gen";
+
+
+    process->setWorkingDirectory(genPath);
+
+    connect(process, &QProcess::readyRead, [=]() {
+        ui->textBrowser->append(process->readAll());
+    });
+
+    connect(process, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), [=]() {
+        ui->textBrowser->append("\n--- RUN DONE ---");
+        process->deleteLater();
+    });
+
+
+    process->start("phits.sh", {"input.i"});
+
 }
 
