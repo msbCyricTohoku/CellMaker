@@ -497,6 +497,10 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
 
 void cellmaker::on_pushButton_clicked()
 {
+    //QString genPath = qApp->applicationDirPath() + "/program_output";
+    //QProcess *process = new QProcess(this);
+    //process->setWorkingDirectory(genPath);
+
     ui->textBrowser->setText("");
     QGraphicsScene *scene = new QGraphicsScene();
 
@@ -778,8 +782,9 @@ void cellmaker::on_pushButton_clicked()
 
      //ui->textBrowser->insertPlainText(sourceType);
 
+     QString outputDir = qApp->applicationDirPath() + "/program_output";
 
-phitsScriptGen("gen/input.i", maxcas,maxbch,sourceType,proj,r0,z0,e0,cellList,bufH, majorZ,cytoMatNo,nucMatNo,buffMatNo);
+phitsScriptGen(outputDir+"/input.i", maxcas,maxbch,sourceType,proj,r0,z0,e0,cellList,bufH, majorZ,cytoMatNo,nucMatNo,buffMatNo);
 
 
 }
@@ -837,7 +842,7 @@ void cellmaker::on_pushButton_2_clicked()
     QProcess *process = new QProcess(this);
 
 
-    QString genPath = qApp->applicationDirPath() + "/gen";
+    QString genPath = qApp->applicationDirPath() + "/program_output";
 
 
     process->setWorkingDirectory(genPath);
