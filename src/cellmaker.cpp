@@ -133,6 +133,25 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
                     const QString proj, const QString r0, const QString z0, const QString e0,
                          QList<CompleteCell> cells, double bufH,double majorZ,int cytoMatNo,int nucMatNo,int buffMatNo)
 {
+    const double micro_factor = 1E-4;
+
+    for (int i = 0; i < cells.size(); ++i) {
+        // Use [] operator to get a reference to the actual object in the list
+        cells[i].x *= micro_factor;
+        cells[i].y *= micro_factor;
+        cells[i].z *= micro_factor;
+        cells[i].rx *= micro_factor;
+        cells[i].rz *= micro_factor;
+        cells[i].majorX *= micro_factor;
+        cells[i].majorY *= micro_factor;
+
+        cells[i].nx *= micro_factor;
+        cells[i].ny *= micro_factor;
+        cells[i].nz *= micro_factor;
+        cells[i].nrx *= micro_factor;
+        cells[i].nrz *= micro_factor;
+    }
+
     QFile f(path);
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         qWarning() << "Failed to open" << path << ":" << f.errorString();
@@ -280,8 +299,11 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     //next id
     int nextId = (totalCells * 2) + 1;
 
+    bufH *=micro_factor;
+    majorZ *= micro_factor;
+
     //global Container Box / Plateq
-    double halfGrid = (cells.last().x) + (cells.first().rx + 20.0);
+    double halfGrid = (cells.last().x) + (cells.first().rx + 20.0*micro_factor);
     int containerId = nextId++;
     out << QString("%1  RPP  %2 %3 %2 %3 0 %4")
                .arg(containerId)
@@ -397,7 +419,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << "ny = 200" << Qt::endl;
     out << " z-type = 1" << Qt::endl;
     out << "nz = 1" << Qt::endl;
-    out << "0.000 " << majorZ+bufH << Qt::endl;
+    out << "0.000 " << (majorZ+bufH)/40. << Qt::endl;
     out << "axis = xy" << Qt::endl;
     out << "file = geometry_topview.out" << Qt::endl;
     out << "output = 6" << Qt::endl;
