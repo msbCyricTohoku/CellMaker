@@ -42,15 +42,16 @@ cellmaker::cellmaker(QWidget *parent)
 
     ui->checkBox->setChecked(true);
     ui->checkBox_2->setChecked(true);
+
     ui->checkBox_3->setChecked(true);
-//    ui->checkBox_4->setChecked(true);
 
 ui->lineEdit_3->setText("0");
 
 ui->lineEdit_4->setText("0");
 
 ui->comboBox->addItem("Uniform");
-    ui->comboBox->addItem("Random");
+
+ui->comboBox->addItem("Random");
 
     ui->comboBox_2->addItem("proton");
     ui->comboBox_2->addItem("neutron");
@@ -93,16 +94,8 @@ ui->comboBox->addItem("Uniform");
 
     ui->comboBox_7->addItem("AIR-DRY-NIST");
 
-
-
     ui->lineEdit_12->setText("10000");
     ui->lineEdit_13->setText("10");
-
-
-
-
-
-
 
 }
 
@@ -133,10 +126,10 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
                     const QString proj, const QString r0, const QString z0, const QString e0,
                          QList<CompleteCell> cells, double bufH,double majorZ,int cytoMatNo,int nucMatNo,int buffMatNo)
 {
-    const double micro_factor = 1E-4;
+    const double micro_factor = 1E-4; //factor to scale down to micron
 
     for (int i = 0; i < cells.size(); ++i) {
-        // Use [] operator to get a reference to the actual object in the list
+
         cells[i].x *= micro_factor;
         cells[i].y *= micro_factor;
         cells[i].z *= micro_factor;
@@ -302,7 +295,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     bufH *=micro_factor;
     majorZ *= micro_factor;
 
-    //global Container Box / Plateq
+    //the buffer medium
     double halfGrid = (cells.last().x) + (cells.first().rx + 20.0*micro_factor);
     int containerId = nextId++;
     out << QString("%1  RPP  %2 %3 %2 %3 0 %4")
@@ -310,7 +303,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
                .arg(-halfGrid)
                .arg(halfGrid)
                .arg(majorZ + bufH) //+5.0 i remove
-        << " $ Global Container Box" << Qt::endl;
+        << " $buffer" << Qt::endl;
 
 
     //the planes
@@ -325,7 +318,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     int px_m = nextId++; out << QString("%1  PX -0.58").arg(px_m)  << Qt::endl;
 
     //le void
-    out << "4000   SO   500.0 $ Outer Vacuum Boundary" << Qt::endl;
+    out << "4000   SO   500.0 $outer boundary" << Qt::endl;
 
     out << "\n[ C e l l ]" << Qt::endl;
 
@@ -353,12 +346,9 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
         Bufdensity = densities[buffMatNo];
     }
 
-
-
-
     //nuc and cyto pairs
     for (const auto& cell : cells) {
-        //nucleus Cell: Material 2 (Inside nucleus surface)
+
         out << QString("%1  %2 -%3  -%4")
                    .arg(cell.nucSurfId, -3)
                    .arg(nucMatNo+1)
@@ -366,8 +356,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
                    .arg(cell.nucSurfId)
             << " $nucleus" << Qt::endl;
 
-        //cytoplasm Cell: Material 1 (Inside cell surface AND above plane, but NOT inside nucleus)
-        // Syntax: (-cellSurf pz_top) #nucSurf
+
         out << QString("%1  %2 -%3 (-%4 %5) #%6")
                    .arg(cell.cellSurfId, -3)
                    .arg(cytoMatNo+1)
@@ -377,7 +366,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
                    .arg(cell.nucSurfId)
             << " $cytoplasm" << Qt::endl;
 
-        //build a string of all cell/nuc IDs to subtract them from the container
+
         allExcludedSurfaces += QString(" #%1 #%2").arg(cell.cellSurfId).arg(cell.nucSurfId);
         domainsREG +=  QString(" %1 %2").arg(cell.cellSurfId).arg(cell.nucSurfId);
     }
@@ -516,12 +505,8 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
 }
 
 
-
 void cellmaker::on_pushButton_clicked()
 {
-    //QString genPath = qApp->applicationDirPath() + "/program_output";
-    //QProcess *process = new QProcess(this);
-    //process->setWorkingDirectory(genPath);
 
     ui->textBrowser->setText("");
     QGraphicsScene *scene = new QGraphicsScene();
@@ -541,8 +526,6 @@ void cellmaker::on_pushButton_clicked()
     //scene->addEllipse(QRectF(150, 0, 100, 50, Qt::red, Qt::yellow));
     //scene->addEllipse(150,0,100,50,Qt::red, Qt::yellow);
     //QRectF rect(0, 0, 50, 50); // Rectangle defined by (x, y, width, height)
-
-
 
     QString cellNoString = ui->lineEdit_6->text();
     QString cellSizeString = ui->lineEdit->text();
@@ -567,11 +550,8 @@ void cellmaker::on_pushButton_clicked()
 
     int nucMatNo = ui->comboBox_5->currentIndex();
     int buffMatNo = ui->comboBox_6->currentIndex();
+
     //int airMatNo = ui->comboBox_7->currentIndex();
-
-
-
-
     //int cellNo = 3;
     //double cellSize = 80.0;  //diameter of each cell
     //double nucleusSize = 10.0;  //diameter of nucleus
@@ -601,7 +581,8 @@ void cellmaker::on_pushButton_clicked()
     const double majorY = majorYString.toDouble();
 
     //double totalGridSize = (cellNo - 1) * spacing;
-   // double offset = totalGridSize / 2.0;
+
+    // double offset = totalGridSize / 2.0;
 
     //int midIndex = cellNo / 2;
 
@@ -613,14 +594,16 @@ void cellmaker::on_pushButton_clicked()
     QString cytoplasmType = ui->comboBox->currentText();
     double userRadius   = ui->spinBoxRandomRadius->value();   // radius within which cells may be displaced
     const int maxAttempts = 1000;                           // safety limit for placement tries
-    QVector<QPointF> placedCenters;                         // stores already‑placed cell centres
+    QVector<QPointF> placedCenters;                         // stores already placed cell centres
     bool placementOk = true;                                // will become false if we cannot place a cell
 
     for (int i = 0; i < cellNo && placementOk; ++i) {
         for (int j = 0; j < cellNo && placementOk; ++j) {
+
             //to fix assymetry issue for even number of cell n^2
             //double cx = (i * spacing) - (gridWidth / 2.0);
             //double cy = (j * spacing) - (gridWidth / 2.0);
+
             double baseCx = (i * spacing) - halfSpan;
             double baseCy = (j * spacing) - halfSpan;
 
@@ -629,9 +612,11 @@ void cellmaker::on_pushButton_clicked()
             //this ensures the central cell (i=midIndex, j=midIndex) is at 0,0
             // double cx = (i - midIndex) * spacing;
             // double cy = (j - midIndex) * spacing;
+
             double cz = 0.0;
 
             //randomize cells aka cytos
+
             double cx = baseCx;
             double cy = baseCy;
 
@@ -641,14 +626,18 @@ void cellmaker::on_pushButton_clicked()
 
                 while (attempts < maxAttempts && !placed) {
                     // pick a random direction
+
                     double thetaPos = 2.0 * M_PI * generator->generateDouble();
                     // pick a random distance that stays inside the user‑defined radius
+
                     double rPos = userRadius * std::sqrt(generator->generateDouble()); //sqrt will give non-uniform distb.values close to 1 than 0
                     // candidate centre
+
                     double candCx = baseCx + rPos * std::cos(thetaPos);
+
                     double candCy = baseCy + rPos * std::sin(thetaPos);
 
-                    //------- check overlap with all previously placed cells -----------------
+                    // check overlap with all previously placed cells
                     bool overlap = false;
                     for (const QPointF &p : placedCenters) {
                         double dx = candCx - p.x();
@@ -682,8 +671,8 @@ void cellmaker::on_pushButton_clicked()
 
             }
 
-            // draw Cytoplasm in QGraphicsScene
-            // Note: We subtract cellSize/2.0 to define the top‑left corner for Qt
+            // draw cytoplasm in QGraphicsScene
+            // subtract cellSize/2.0 to define the top left
             QRectF cellRect(cx - cellSize / 2.0,
                             cy - cellSize / 2.0,
                             cellSize,
@@ -724,42 +713,34 @@ void cellmaker::on_pushButton_clicked()
             //the following was simple check, issue is cell shape is complex
             //it when nucleus moves up the dome it can fall outside
 
-
             /*
         //random nuclues pos.
-        //calculate a safe radius for the nucleus center so it doesn't hit the side walls
-        double maxLateralOffset = cc.rx - (nucleusSize / 2.0) - 0.00001; // Subtract small epsilon for safety
+        double maxLateralOffset = cc.rx - (nucleusSize / 2.0) - 0.00001;
         theta = 2.0 _M_PI_ generator->generateDouble();
         r = maxLateralOffset * sqrt(generator->generateDouble());
         cc.nx = cc.x + r * cos(theta);
         cc.ny = cc.y + r * sin(theta);
-        // a safe Z height
-        // To keep it inside a semi-ellipsoid, we must ensure it doesn't hit the "dome"
-        // For a sphere‑like nucleus, we place it in the lower‑middle half:
-        cc.nrz = nucleusSize / 4.0; // Example vertical radius
-        cc.nrx = nucleusSize / 2.0; // Horizontal radius
-        // Place nz such that it is always above z=0 and below the dome height
+        cc.nrz = nucleusSize / 4.0;
+        cc.nrx = nucleusSize / 2.0;
         cc.nz = cc.nrz + (cc.rz _0.5_ generator->generateDouble());
         */
 
             cc.nrx = nucleusSize / 2.0;
-            cc.nrz = nucleusSize / 4.0; // Example: Nucleus is flatter than cell
-            //safe Z for the nucleus
-            //above 0 + nrz and below cell height - nrz
+            cc.nrz = nucleusSize / 4.0;
             double minNz = cc.nrz + 0.000001;
             double maxNz = cc.rz - cc.nrz - 0.000001;
             cc.nz = minNz + (maxNz - minNz) * generator->generateDouble();
-            //safe lateral (XY) offset at this height
-            //based on ellipsoid eq: localRx = rx * sqrt(1 - (nz/rz)^2)
+
             double localCellRx = cc.rx *
                                  std::sqrt(1.0 - std::pow(cc.nz / cc.rz, 2));
             double maxLateralOffset = localCellRx - cc.nrx - 0.000001;
-            if (maxLateralOffset < 0) maxLateralOffset = 0; // Safety for very small cells
+            if (maxLateralOffset < 0) maxLateralOffset = 0;
             theta = 2.0 * M_PI * generator->generateDouble();
             r = maxLateralOffset * std::sqrt(generator->generateDouble());
             cc.nx = cc.x + r * std::cos(theta);
             cc.ny = cc.y + r * std::sin(theta);
-            // Assign IDs
+
+            //ids
             cc.cellSurfId = cellList.size() + 1;
             cc.nucSurfId  = cc.cellSurfId + (cellNo * cellNo);
             cellList.append(cc);
@@ -794,10 +775,7 @@ void cellmaker::on_pushButton_clicked()
 
     //ui->graphicsView_2->fitInView(scene2->itemsBoundingRect(), Qt::KeepAspectRatio);
 
-
-
      QString proj = ui->comboBox_2->currentText();
-
      QString r0 = ui->lineEdit_8->text();
      QString z0 = ui->lineEdit_9->text();
      QString e0 = ui->lineEdit_7->text();
@@ -807,7 +785,6 @@ void cellmaker::on_pushButton_clicked()
      QString outputDir = qApp->applicationDirPath() + "/program_output";
 
 phitsScriptGen(outputDir+"/input.i", maxcas,maxbch,sourceType,proj,r0,z0,e0,cellList,bufH, majorZ,cytoMatNo,nucMatNo,buffMatNo);
-
 
 }
 
