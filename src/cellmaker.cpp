@@ -55,7 +55,7 @@ ui->comboBox->addItem("Random");
 
     ui->comboBox_2->addItem("proton");
     ui->comboBox_2->addItem("neutron");
-    ui->comboBox_2->addItem("electron");
+    ui->comboBox_2->addItem("photon");
     ui->comboBox_2->addItem("alpha");
 
     ui->lineEdit_7->setText("70");
@@ -299,7 +299,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     //the buffer medium
     double halfGrid = (cells.last().x) + (cells.first().rx + 20.0*micro_factor);
     int containerId = nextId++;
-    out << QString("%1  RPP  %2 %3 %2 %3 0 %4")
+    out << QString("%1  RPP  %2 %3 %2 %3 -1.0e-5 %4") //here i moved RPP little below zero so it will not overlap and be same surf as PZ 0.0
                .arg(containerId)
                .arg(-halfGrid)
                .arg(halfGrid)
@@ -313,10 +313,10 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << QString("%1  PZ  -2.0e-5").arg(pz_bottom) << Qt::endl;
     out << QString("%1  PZ  0.0").arg(pz_top)     << Qt::endl;
 
-    int py_p = nextId++; out << QString("%1  PY  0.58").arg(py_p)  << Qt::endl;
-    int py_m = nextId++; out << QString("%1  PY -0.58").arg(py_m)  << Qt::endl;
-    int px_p = nextId++; out << QString("%1  PX  0.58").arg(px_p)  << Qt::endl;
-    int px_m = nextId++; out << QString("%1  PX -0.58").arg(px_m)  << Qt::endl;
+    int py_p = nextId++; out << QString("%1  PY  0.50").arg(py_p)  << Qt::endl;
+    int py_m = nextId++; out << QString("%1  PY -0.50").arg(py_m)  << Qt::endl;
+    int px_p = nextId++; out << QString("%1  PX  0.50").arg(px_p)  << Qt::endl;
+    int px_m = nextId++; out << QString("%1  PX -0.50").arg(px_m)  << Qt::endl;
 
     //le void
     out << "4000   SO   500.0 $outer boundary" << Qt::endl;
@@ -325,6 +325,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
 
     QString allExcludedSurfaces = "";
     QString domainsREG = "";
+    int cellCounter = 0;
 
     double Cytodensity=0.0;
     double Nucdensity=0.0;
@@ -367,9 +368,16 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
                    .arg(cell.nucSurfId)
             << " $cytoplasm" << Qt::endl;
 
+        //line break with 5 space to tackle phist limit
+        if (cellCounter > 0 && cellCounter % 8 == 0) {
+            allExcludedSurfaces += "\n     ";
+            domainsREG += "\n     ";
+        }
+
 
         allExcludedSurfaces += QString(" #%1 #%2").arg(cell.cellSurfId).arg(cell.nucSurfId);
         domainsREG +=  QString(" %1 %2").arg(cell.cellSurfId).arg(cell.nucSurfId);
+        cellCounter++;
     }
 
     out << QString("3000  %1 -%2  (-%3 %4)")
@@ -728,14 +736,47 @@ void cellmaker::on_pushButton_clicked()
 
             cc.nrx = nucleusSize / 2.0;
             cc.nrz = nucleusSize / 4.0;
+
             double minNz = cc.nrz + 0.000001;
-            double maxNz = cc.rz - cc.nrz - 0.000001;
+
+            //double maxNz = cc.rz - cc.nrz - 0.000001;
+            //calculate the absolute highest the nucleus center can go without go through the dome
+            double maxNz = cc.rz * std::sqrt(1.0 - std::pow(cc.nrx / cc.rx, 2)) - cc.nrz - 0.000001;
+
+            if (maxNz < minNz || cc.nrx >= cc.rx) {
+                ui->textBrowser->setText(
+                    tr("<font color='red'>Error: Nucleus is too large to fit inside the cell domain. Please reduce nucleus size or increase cell size.</font>")
+                    );
+                placementOk = false;
+                //break; //stop generating cells
+            }
+
+            //safe rand placement
             cc.nz = minNz + (maxNz - minNz) * generator->generateDouble();
 
-            double localCellRx = cc.rx *
-                                 std::sqrt(1.0 - std::pow(cc.nz / cc.rz, 2));
-            double maxLateralOffset = localCellRx - cc.nrx - 0.000001;
+            //calculate safe lateral offset based on the highest point of the nucleus
+            double topOfNucleusZ = cc.nz + cc.nrz;
+            double safeCellRx = cc.rx * std::sqrt(1.0 - std::pow(topOfNucleusZ / cc.rz, 2));
+
+            double maxLateralOffset = safeCellRx - cc.nrx - 0.000001;
             if (maxLateralOffset < 0) maxLateralOffset = 0;
+
+           // cc.nz = minNz + (maxNz - minNz) * generator->generateDouble();
+
+            //double topOfNucleusZ = cc.nz + cc.nrz;
+
+            //double safeCellRx = cc.rx * std::sqrt(1.0 - std::pow(topOfNucleusZ / cc.rz, 2));
+
+            //double maxLateralOffset = safeCellRx - cc.nrx - 0.000001;
+
+            //if (maxLateralOffset < 0) maxLateralOffset = 0;
+
+            //double localCellRx = cc.rx *
+            //                     std::sqrt(1.0 - std::pow(cc.nz / cc.rz, 2));
+            //maxLateralOffset = localCellRx - cc.nrx - 0.000001;
+            //if (maxLateralOffset < 0) maxLateralOffset = 0;
+
+
             theta = 2.0 * M_PI * generator->generateDouble();
             r = maxLateralOffset * std::sqrt(generator->generateDouble());
             cc.nx = cc.x + r * std::cos(theta);
