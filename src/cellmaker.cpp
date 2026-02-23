@@ -1,433 +1,429 @@
 #include "cellmaker.h"
 #include "ui_cellmaker.h"
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions>
-#include <QPainter>
-#include <QRandomGenerator>
-#include <QVector>
-#include <QPointF>
-#include <QGroupBox>
-#include <QSizePolicy>
-#include <QtMath>
-#include <QWheelEvent>
-    #include <QRandomGenerator>
-#include <QPainterPath>
-#include <QGraphicsPathItem>
-#include <QMessageBox>
-#include <QFile>
-#include <QTextStream>
-#include <QStringList>
-#include <QFileInfo>
-#include <QDir>
 #include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QGraphicsPathItem>
+#include <QGroupBox>
+#include <QMessageBox>
+#include <QOpenGLFunctions>
+#include <QOpenGLWidget>
+#include <QPainter>
+#include <QPainterPath>
+#include <QPointF>
 #include <QProcess>
+#include <QRandomGenerator>
+#include <QSizePolicy>
+#include <QStringList>
+#include <QTextStream>
+#include <QVector>
+#include <QWheelEvent>
+#include <QtMath>
 
 cellmaker::cellmaker(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::cellmaker)
-{
-    ui->setupUi(this);
+    : QMainWindow(parent), ui(new Ui::cellmaker) {
+  ui->setupUi(this);
 
-    ui->lineEdit_6->setText("3");
+  ui->lineEdit_6->setText("3");
 
-    ui->lineEdit->setText("30");
+  ui->lineEdit->setText("30");
 
-    ui->lineEdit_10->setText("10");
+  ui->lineEdit_10->setText("10");
 
-    ui->lineEdit_11->setText("0");
+  ui->lineEdit_11->setText("0");
 
-    ui->lineEdit_2->setText("100");
+  ui->lineEdit_2->setText("100");
 
-    ui->lineEdit_5->setText("20");
+  ui->lineEdit_5->setText("20");
 
-    ui->checkBox->setChecked(true);
-    ui->checkBox_2->setChecked(true);
+  ui->checkBox->setChecked(true);
+  ui->checkBox_2->setChecked(true);
 
-    ui->checkBox_3->setChecked(true);
+  ui->checkBox_3->setChecked(true);
 
-ui->lineEdit_3->setText("0");
+  ui->lineEdit_3->setText("0");
 
-ui->lineEdit_4->setText("0");
+  ui->lineEdit_4->setText("0");
 
-ui->comboBox->addItem("Uniform");
+  ui->comboBox->addItem("Uniform");
 
-ui->comboBox->addItem("Random");
+  ui->comboBox->addItem("Random");
 
-    ui->comboBox_2->addItem("proton");
-    ui->comboBox_2->addItem("neutron");
-    ui->comboBox_2->addItem("photon");
-    ui->comboBox_2->addItem("alpha");
+  ui->comboBox_2->addItem("proton");
+  ui->comboBox_2->addItem("neutron");
+  ui->comboBox_2->addItem("photon");
+  ui->comboBox_2->addItem("alpha");
 
-    ui->lineEdit_7->setText("70");
+  ui->lineEdit_7->setText("70");
 
-    ui->comboBox_3->addItem("Disk");
-    ui->comboBox_3->addItem("Point");
+  ui->comboBox_3->addItem("Disk");
+  ui->comboBox_3->addItem("Point");
 
+  ui->lineEdit_8->setText("1");
 
-    ui->lineEdit_8->setText("1");
+  ui->lineEdit_9->setText("100");
 
-    ui->lineEdit_9->setText("100");
+  ui->comboBox_4->addItem("TISSUE-SOFT(ICRU-44)");
+  ui->comboBox_4->addItem("WATER");
+  ui->comboBox_4->addItem("BONE-CORTICAL(ICRU-44)");
+  ui->comboBox_4->addItem("ADIPOSE-TISSUE");
+  ui->comboBox_4->addItem("A-150-PLASTIC");
+  ui->comboBox_4->addItem("B-100-PLASTIC");
+  ui->comboBox_4->addItem("MUSCLE-SKELETAL");
 
-    ui->comboBox_4->addItem("TISSUE-SOFT(ICRU-44)");
-    ui->comboBox_4->addItem("WATER");
-    ui->comboBox_4->addItem("BONE-CORTICAL(ICRU-44)");
-    ui->comboBox_4->addItem("ADIPOSE-TISSUE");
-    ui->comboBox_4->addItem("A-150-PLASTIC");
-    ui->comboBox_4->addItem("B-100-PLASTIC");
-    ui->comboBox_4->addItem("MUSCLE-SKELETAL");
+  ui->comboBox_5->addItem("TISSUE-SOFT(ICRU-44)");
+  ui->comboBox_5->addItem("WATER");
+  ui->comboBox_5->addItem("BONE-CORTICAL(ICRU-44)");
+  ui->comboBox_5->addItem("ADIPOSE-TISSUE");
+  ui->comboBox_5->addItem("A-150-PLASTIC");
+  ui->comboBox_5->addItem("B-100-PLASTIC");
+  ui->comboBox_5->addItem("MUSCLE-SKELETAL");
 
-    ui->comboBox_5->addItem("TISSUE-SOFT(ICRU-44)");
-    ui->comboBox_5->addItem("WATER");
-    ui->comboBox_5->addItem("BONE-CORTICAL(ICRU-44)");
-    ui->comboBox_5->addItem("ADIPOSE-TISSUE");
-    ui->comboBox_5->addItem("A-150-PLASTIC");
-    ui->comboBox_5->addItem("B-100-PLASTIC");
-    ui->comboBox_5->addItem("MUSCLE-SKELETAL");
+  ui->comboBox_6->addItem("TISSUE-SOFT(ICRU-44)");
+  ui->comboBox_6->addItem("WATER");
+  ui->comboBox_6->addItem("BONE-CORTICAL(ICRU-44)");
+  ui->comboBox_6->addItem("ADIPOSE-TISSUE");
+  ui->comboBox_6->addItem("A-150-PLASTIC");
+  ui->comboBox_6->addItem("B-100-PLASTIC");
+  ui->comboBox_6->addItem("MUSCLE-SKELETAL");
 
-    ui->comboBox_6->addItem("TISSUE-SOFT(ICRU-44)");
-    ui->comboBox_6->addItem("WATER");
-    ui->comboBox_6->addItem("BONE-CORTICAL(ICRU-44)");
-    ui->comboBox_6->addItem("ADIPOSE-TISSUE");
-    ui->comboBox_6->addItem("A-150-PLASTIC");
-    ui->comboBox_6->addItem("B-100-PLASTIC");
-    ui->comboBox_6->addItem("MUSCLE-SKELETAL");
+  ui->comboBox_7->addItem("AIR-DRY-NIST");
 
-    ui->comboBox_7->addItem("AIR-DRY-NIST");
-
-    ui->lineEdit_12->setText("10000");
-    ui->lineEdit_13->setText("10");
-
+  ui->lineEdit_12->setText("10000");
+  ui->lineEdit_13->setText("10");
 }
 
-cellmaker::~cellmaker()
-{
-    delete ui;
+cellmaker::~cellmaker() { delete ui; }
+
+void cellmaker::on_pushButton_5_clicked() {
+  ui->graphicsView->scale(1.1, 1.1);
+  ui->graphicsView_2->scale(1.1, 1.1);
 }
 
+void cellmaker::on_pushButton_6_clicked() {
 
-
-void cellmaker::on_pushButton_5_clicked()
-{
-        ui->graphicsView->scale(1.1,1.1);
-    ui->graphicsView_2->scale(1.1,1.1);
+  ui->graphicsView->scale(0.9, 0.9);
+  ui->graphicsView_2->scale(0.9, 0.9);
 }
 
+void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
+                               const QString &maxbch, const QString sourceType,
+                               const QString proj, const QString r0,
+                               const QString z0, const QString e0,
+                               QList<CompleteCell> cells, double bufH,
+                               double majorZ, int cytoMatNo, int nucMatNo,
+                               int buffMatNo) {
+  const double micro_factor = 1E-4; // factor to scale down to micron
 
-void cellmaker::on_pushButton_6_clicked()
-{
+  for (int i = 0; i < cells.size(); ++i) {
 
-    ui->graphicsView->scale(0.9,0.9);
-    ui->graphicsView_2->scale(0.9,0.9);
+    cells[i].x *= micro_factor;
+    cells[i].y *= micro_factor;
+    cells[i].z *= micro_factor;
+    cells[i].rx *= micro_factor;
+    cells[i].rz *= micro_factor;
+    cells[i].majorX *= micro_factor;
+    cells[i].majorY *= micro_factor;
 
-}
+    cells[i].nx *= micro_factor;
+    cells[i].ny *= micro_factor;
+    cells[i].nz *= micro_factor;
+    cells[i].nrx *= micro_factor;
+    cells[i].nrz *= micro_factor;
+  }
 
+  QFile f(path);
+  if (!f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+    qWarning() << "Failed to open" << path << ":" << f.errorString();
+    return;
+  }
+  QTextStream out(&f);
+  out.setRealNumberNotation(QTextStream::FixedNotation);
+  out.setRealNumberPrecision(6);
 
-void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const QString &maxbch, const QString sourceType,
-                    const QString proj, const QString r0, const QString z0, const QString e0,
-                         QList<CompleteCell> cells, double bufH,double majorZ,int cytoMatNo,int nucMatNo,int buffMatNo)
-{
-    const double micro_factor = 1E-4; //factor to scale down to micron
+  // header of inp
+  // out << "$OMP=40" << Qt::endl;
+  out << "[ T i t l e ]" << Qt::endl;
+  out << "Generated by Cell Maker Program" << "\n\n";
 
-    for (int i = 0; i < cells.size(); ++i) {
+  out << "[ P a r a m e t e r s ]" << Qt::endl;
+  out << "icntl  =  0" << Qt::endl;
+  out << "maxcas =  " << maxcas << Qt::endl;
+  out << "maxbch =  " << maxbch << "\n\n";
 
-        cells[i].x *= micro_factor;
-        cells[i].y *= micro_factor;
-        cells[i].z *= micro_factor;
-        cells[i].rx *= micro_factor;
-        cells[i].rz *= micro_factor;
-        cells[i].majorX *= micro_factor;
-        cells[i].majorY *= micro_factor;
+  // source card here, it is dynamic for disk and point
+  out << "[ S o u r c e ]" << Qt::endl;
 
-        cells[i].nx *= micro_factor;
-        cells[i].ny *= micro_factor;
-        cells[i].nz *= micro_factor;
-        cells[i].nrx *= micro_factor;
-        cells[i].nrz *= micro_factor;
-    }
+  if (sourceType.trimmed().compare(QLatin1String("Point"),
+                                   Qt::CaseInsensitive) == 0) {
+    // Point Source Logic (s-type = 9)
+    out << "s-type = 9" << Qt::endl;
+    out << "proj = " << proj << Qt::endl;
+    out << "dir = all" << Qt::endl;
+    out << "r1 = " << r0 << Qt::endl;
+    out << "r2 = " << r0 << Qt::endl;
+    out << "x0 = 0.00" << Qt::endl;
+    out << "y0 = 0.00" << Qt::endl;
+    out << "z0 = " << z0 << Qt::endl;
+  } else {
+    // Default Source Logic (s-type = 1)
+    out << "s-type = 1" << Qt::endl;
+    out << "proj = " << proj << Qt::endl;
+    out << "dir = -1.00" << Qt::endl;
+    out << "r0 = " << r0 << Qt::endl;
+    out << "x0 = 0.00" << Qt::endl;
+    out << "y0 = 0.00" << Qt::endl;
+    out << "z0 = " << z0 << Qt::endl;
+    out << "z1 = " << z0 << Qt::endl;
+  }
+  out << "e0 = " << e0 << "\n\n";
 
-    QFile f(path);
-    if (!f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-        qWarning() << "Failed to open" << path << ":" << f.errorString();
-        return;
-    }
-    QTextStream out(&f);
-    out.setRealNumberNotation(QTextStream::FixedNotation);
-    out.setRealNumberPrecision(6);
+  out << "[ M a t e r i a l ]" << Qt::endl;
+  out << "mat[1] $TISSUE-SOFT(ICRU-44)" << Qt::endl;
+  out << "1000 -10.5 " << Qt::endl;
+  out << "6000 -25.6" << Qt::endl;
+  out << "7000 -2.7 " << Qt::endl;
+  out << "8000 -60.2" << Qt::endl;
+  out << "11000 -0.1" << Qt::endl;
+  out << "15000 -0.2" << Qt::endl;
+  out << "16000 -0.3" << Qt::endl;
+  out << "17000 -0.2" << Qt::endl;
+  out << "19000 -0.2\n" << Qt::endl;
 
-    //header of inp
-    out << "$OMP=40" << Qt::endl;
-    out << "[ T i t l e ]" << Qt::endl;
-    out << "Generated by Cell Maker Program" << "\n\n";
+  out << "mat[2] $WATER" << Qt::endl;
+  out << "1000 -11.1" << Qt::endl;
+  out << "8000 -88.9\n" << Qt::endl;
 
-    out << "[ P a r a m e t e r s ]" << Qt::endl;
-    out << "icntl  =  0" << Qt::endl;
-    out << "maxcas =  " << maxcas << Qt::endl;
-    out << "maxbch =  " << maxbch << "\n\n";
+  out << "mat[3] $BONE-CORTICAL(ICRU-44)" << Qt::endl;
+  out << "1000 -3.4" << Qt::endl;
+  out << "6000 -15.5" << Qt::endl;
+  out << "7000 -4.2" << Qt::endl;
+  out << "8000 -43.5" << Qt::endl;
+  out << "11000 -0.1" << Qt::endl;
+  out << "12000 -0.2" << Qt::endl;
+  out << "15000 -10.3" << Qt::endl;
+  out << "16000 -0.3" << Qt::endl;
+  out << "20000 -22.5\n" << Qt::endl;
 
-    //source card here, it is dynamic for disk and point
-    out << "[ S o u r c e ]" << Qt::endl;
+  out << "mat[4] $ADIPOSE-TISSUE" << Qt::endl;
+  out << "1000 -11.4" << Qt::endl;
+  out << "6000 -59.8" << Qt::endl;
+  out << "7000 -0.7" << Qt::endl;
+  out << "8000 -27.8" << Qt::endl;
+  out << "11000 -0.1" << Qt::endl;
+  out << "16000 -0.1" << Qt::endl;
+  out << "17000 -0.1\n" << Qt::endl;
 
-    if (sourceType.trimmed().compare(QLatin1String("Point"), Qt::CaseInsensitive) == 0) {
-        // Point Source Logic (s-type = 9)
-        out << "s-type = 9" << Qt::endl;
-        out << "proj = " << proj << Qt::endl;
-        out << "dir = all" << Qt::endl;
-        out << "r1 = " << r0 << Qt::endl;
-        out << "r2 = " << r0 << Qt::endl;
-        out << "x0 = 0.00" << Qt::endl;
-        out << "y0 = 0.00" << Qt::endl;
-        out << "z0 = " << z0 << Qt::endl;
-    } else {
-        // Default Source Logic (s-type = 1)
-        out << "s-type = 1" << Qt::endl;
-        out << "proj = " << proj << Qt::endl;
-        out << "dir = -1.00" << Qt::endl;
-        out << "r0 = " << r0 << Qt::endl;
-        out << "x0 = 0.00" << Qt::endl;
-        out << "y0 = 0.00" << Qt::endl;
-        out << "z0 = " << z0 << Qt::endl;
-        out << "z1 = " << z0 << Qt::endl;
-    }
-    out << "e0 = " << e0 << "\n\n";
+  out << "mat[5] $A-150-PLASTIC" << Qt::endl;
+  out << "1000 -10.1" << Qt::endl;
+  out << "6000 -77.6" << Qt::endl;
+  out << "7000 -3.5" << Qt::endl;
+  out << "8000 -5.2" << Qt::endl;
+  out << "9000 -1.7" << Qt::endl;
+  out << "20000 -1.9\n" << Qt::endl;
 
-    out << "[ M a t e r i a l ]" << Qt::endl;
-    out << "mat[1] $TISSUE-SOFT(ICRU-44)" << Qt::endl;
-    out << "1000 -10.5 " << Qt::endl;
-    out << "6000 -25.6" << Qt::endl;
-    out << "7000 -2.7 " << Qt::endl;
-    out << "8000 -60.2" << Qt::endl;
-    out << "11000 -0.1" << Qt::endl;
-    out << "15000 -0.2" << Qt::endl;
-    out << "16000 -0.3" << Qt::endl;
-    out << "17000 -0.2" << Qt::endl;
-    out << "19000 -0.2\n" << Qt::endl;
+  out << "mat[6] $B-100-PLASTIC" << Qt::endl;
+  out << "1000 -6.6" << Qt::endl;
+  out << "6000 -53.7" << Qt::endl;
+  out << "7000 -2.1" << Qt::endl;
+  out << "8000 -3.2" << Qt::endl;
+  out << "9000 -16.7" << Qt::endl;
+  out << "20000 -17.7\n" << Qt::endl;
 
-    out << "mat[2] $WATER" << Qt::endl;
-    out << "1000 -11.1" << Qt::endl;
-    out << "8000 -88.9\n" << Qt::endl;
+  out << "mat[7] $MUSCLE-SKELETAL" << Qt::endl;
+  out << "1000 -10.2" << Qt::endl;
+  out << "6000 -14.3" << Qt::endl;
+  out << "7000 -3.4" << Qt::endl;
+  out << "8000 -71.0" << Qt::endl;
+  out << "11000 -0.1" << Qt::endl;
+  out << "15000 -0.2" << Qt::endl;
+  out << "16000 -0.3" << Qt::endl;
+  out << "17000 -0.1" << Qt::endl;
+  out << "19000 -0.4\n" << Qt::endl;
 
-    out << "mat[3] $BONE-CORTICAL(ICRU-44)" << Qt::endl;
-    out << "1000 -3.4" << Qt::endl;
-    out << "6000 -15.5" << Qt::endl;
-    out << "7000 -4.2" << Qt::endl;
-    out << "8000 -43.5" << Qt::endl;
-    out << "11000 -0.1" << Qt::endl;
-    out << "12000 -0.2" << Qt::endl;
-    out << "15000 -10.3" << Qt::endl;
-    out << "16000 -0.3" << Qt::endl;
-    out << "20000 -22.5\n" << Qt::endl;
+  out << "mat[8] $AIR-DRY-NIST" << Qt::endl;
+  out << "6000 -0.0124" << Qt::endl;
+  out << "7000 -75.5267" << Qt::endl;
+  out << "8000 -23.1781" << Qt::endl;
+  out << "18000 -1.2827\n\n" << Qt::endl;
 
-    out << "mat[4] $ADIPOSE-TISSUE" << Qt::endl;
-    out << "1000 -11.4" << Qt::endl;
-    out << "6000 -59.8" << Qt::endl;
-    out << "7000 -0.7" << Qt::endl;
-    out << "8000 -27.8" << Qt::endl;
-    out << "11000 -0.1" << Qt::endl;
-    out << "16000 -0.1" << Qt::endl;
-    out << "17000 -0.1\n" << Qt::endl;
+  out << "[ S u r f a c e ]" << Qt::endl;
 
-    out << "mat[5] $A-150-PLASTIC" << Qt::endl;
-    out << "1000 -10.1" << Qt::endl;
-    out << "6000 -77.6" << Qt::endl;
-    out << "7000 -3.5" << Qt::endl;
-    out << "8000 -5.2" << Qt::endl;
-    out << "9000 -1.7" << Qt::endl;
-    out << "20000 -1.9\n" << Qt::endl;
+  // nucleus surf section ehere
+  int totalCells = cells.size();
+  for (int i = 0; i < totalCells; ++i) {
+    const auto &cell = cells[i];
+    out << QString("%1  ELL  %2 %3 %4  0 0 %5  %6")
+               .arg(cell.nucSurfId, -3)
+               .arg(cell.nx, 8, 'f', 6)
+               .arg(cell.ny, 8, 'f', 6)
+               .arg(cell.nz, 8, 'f', 6)
+               .arg(cell.nrz, 8, 'f', 6)
+               .arg(-cell.nrx, 8, 'f', 6)
+        << " $nucleus" << Qt::endl;
+  }
 
-    out << "mat[6] $B-100-PLASTIC" << Qt::endl;
-    out << "1000 -6.6" << Qt::endl;
-    out << "6000 -53.7" << Qt::endl;
-    out << "7000 -2.1" << Qt::endl;
-    out << "8000 -3.2" << Qt::endl;
-    out << "9000 -16.7" << Qt::endl;
-    out << "20000 -17.7\n" << Qt::endl;
+  // cell cyto surfaces
+  for (int i = 0; i < totalCells; ++i) {
+    const auto &cell = cells[i];
+    out << QString("%1  ELL  %2 %3 %4  %5 %6 %7  %8")
+               .arg(cell.cellSurfId, -3)
+               .arg(cell.x, 8, 'f', 6)
+               .arg(cell.y, 8, 'f', 6)
+               .arg(cell.z, 8, 'f', 6)
+               .arg(cell.majorX, 8, 'f', 6)
+               .arg(cell.majorY, 8, 'f', 6)
+               .arg(cell.rz, 8, 'f', 6)
+               .arg(-cell.rx, 8, 'f', 6)
+        << " $cytoplasm" << Qt::endl;
+  }
 
-    out << "mat[7] $MUSCLE-SKELETAL" << Qt::endl;
-    out << "1000 -10.2" << Qt::endl;
-    out << "6000 -14.3" << Qt::endl;
-    out << "7000 -3.4" << Qt::endl;
-    out << "8000 -71.0" << Qt::endl;
-    out << "11000 -0.1" << Qt::endl;
-    out << "15000 -0.2" << Qt::endl;
-    out << "16000 -0.3" << Qt::endl;
-    out << "17000 -0.1" << Qt::endl;
-    out << "19000 -0.4\n" << Qt::endl;
+  // next id
+  int nextId = (totalCells * 2) + 1;
 
-    out << "mat[8] $AIR-DRY-NIST" << Qt::endl;
-    out << "6000 -0.0124" << Qt::endl;
-    out << "7000 -75.5267" << Qt::endl;
-    out << "8000 -23.1781" << Qt::endl;
-    out << "18000 -1.2827\n\n" << Qt::endl;
+  bufH *= micro_factor;
+  majorZ *= micro_factor;
 
-    out << "[ S u r f a c e ]" << Qt::endl;
+  // below fixing issue for randomized cells, the last() function cannot work
+  // for randomized find the furthest point any cell reaches (center+rad)
+  double maxExtent = 0.0;
+  for (const auto &cell : cells) {
 
-    //nucleus surf section ehere
-    int totalCells = cells.size();
-    for (int i = 0; i < totalCells; ++i) {
-        const auto& cell = cells[i];
-        out << QString("%1  ELL  %2 %3 %4  0 0 %5  %6")
-                   .arg(cell.nucSurfId, -3)
-                   .arg(cell.nx, 8, 'f', 6)
-                   .arg(cell.ny, 8, 'f', 6)
-                   .arg(cell.nz, 8, 'f', 6)
-                   .arg(cell.nrz, 8, 'f', 6)
-                   .arg(-cell.nrx, 8, 'f', 6)
-            << " $nucleus" << Qt::endl;
-    }
+    double reachX = std::abs(cell.x) + cell.rx;
+    double reachY =
+        std::abs(cell.y) + cell.rx; // assuming rx is used for Y plane
 
-    //cell cyto surfaces
-    for (int i = 0; i < totalCells; ++i) {
-        const auto& cell = cells[i];
-        out << QString("%1  ELL  %2 %3 %4  %5 %6 %7  %8")
-                   .arg(cell.cellSurfId, -3)
-                   .arg(cell.x, 8, 'f', 6)
-                   .arg(cell.y, 8, 'f', 6)
-                   .arg(cell.z, 8, 'f', 6)
-                   .arg(cell.majorX,8,'f',6)
-                   .arg(cell.majorY,8,'f',6)
-                   .arg(cell.rz, 8, 'f', 6)
-                   .arg(-cell.rx, 8, 'f', 6)
-            << " $cytoplasm" << Qt::endl;
-    }
+    maxExtent = std::max({maxExtent, reachX, reachY});
+  }
 
-    //next id
-    int nextId = (totalCells * 2) + 1;
+  double halfGrid = maxExtent + (20.0 * micro_factor);
 
-    bufH *=micro_factor;
-    majorZ *= micro_factor;
+  // the buffer medium
+  // below does not work for randomized cells
+  // double halfGrid = (cells.last().x) + (cells.first().rx
+  // + 20.0*micro_factor);
 
-    //below fixing issue for randomized cells, the last() function cannot work for randomized
-    //find the furthest point any cell reaches (center+rad)
-    double maxExtent = 0.0;
-    for (const auto& cell : cells) {
+  int containerId = nextId++;
+  out << QString(
+             "%1  RPP  %2 %3 %2 %3 -1.0e-5 %4") // here i moved RPP little below
+                                                // zero so it will not overlap
+                                                // and be same surf as PZ 0.0
+                                                    .arg(containerId)
+                                                    .arg(-halfGrid)
+                                                    .arg(halfGrid)
+                                                    .arg(majorZ +
+                                                         bufH) //+5.0 i remove
+      << " $buffer" << Qt::endl;
 
-        double reachX = std::abs(cell.x) + cell.rx;
-        double reachY = std::abs(cell.y) + cell.rx; // assuming rx is used for Y plane
+  // the planes
+  int pz_bottom = nextId++; // Equivalent to 11 in your example
+  int pz_top = nextId++;    // Equivalent to 12
+  out << QString("%1  PZ  -2.0e-5").arg(pz_bottom) << Qt::endl;
+  out << QString("%1  PZ  0.0").arg(pz_top) << Qt::endl;
 
-        maxExtent = std::max({maxExtent, reachX, reachY});
-    }
+  int py_p = nextId++;
+  out << QString("%1  PY  0.50").arg(py_p) << Qt::endl;
+  int py_m = nextId++;
+  out << QString("%1  PY -0.50").arg(py_m) << Qt::endl;
+  int px_p = nextId++;
+  out << QString("%1  PX  0.50").arg(px_p) << Qt::endl;
+  int px_m = nextId++;
+  out << QString("%1  PX -0.50").arg(px_m) << Qt::endl;
 
+  // le void
+  out << "4000   SO   500.0 $outer boundary" << Qt::endl;
 
+  out << "\n[ C e l l ]" << Qt::endl;
 
+  QString allExcludedSurfaces = "";
+  QString domainsREG = "";
+  int cellCounter = 0;
 
-    double halfGrid = maxExtent + (20.0 * micro_factor);
+  double Cytodensity = 0.0;
+  double Nucdensity = 0.0;
+  double Bufdensity = 0.0;
+  double Airdensity = -0.00129;
+  static const double densities[] = {1.06, 1.00, 1.92, 0.95, 1.127, 1.45, 1.05};
+  const int num_materials = sizeof(densities) / sizeof(densities[0]);
 
-    //the buffer medium
-    //below does not work for randomized cells
-    //double halfGrid = (cells.last().x) + (cells.first().rx + 20.0*micro_factor);
+  // qDebug() << num_materials << Qt::endl;
 
-    int containerId = nextId++;
-    out << QString("%1  RPP  %2 %3 %2 %3 -1.0e-5 %4") //here i moved RPP little below zero so it will not overlap and be same surf as PZ 0.0
-               .arg(containerId)
-               .arg(-halfGrid)
-               .arg(halfGrid)
-               .arg(majorZ + bufH) //+5.0 i remove
-        << " $buffer" << Qt::endl;
+  if (cytoMatNo >= 0 && cytoMatNo < num_materials) {
+    Cytodensity = densities[cytoMatNo];
+  }
 
+  if (nucMatNo >= 0 && nucMatNo < num_materials) {
+    Nucdensity = densities[nucMatNo];
+  }
 
-    //the planes
-    int pz_bottom = nextId++; // Equivalent to 11 in your example
-    int pz_top    = nextId++; // Equivalent to 12
-    out << QString("%1  PZ  -2.0e-5").arg(pz_bottom) << Qt::endl;
-    out << QString("%1  PZ  0.0").arg(pz_top)     << Qt::endl;
+  if (buffMatNo >= 0 && buffMatNo < num_materials) {
+    Bufdensity = densities[buffMatNo];
+  }
 
-    int py_p = nextId++; out << QString("%1  PY  0.50").arg(py_p)  << Qt::endl;
-    int py_m = nextId++; out << QString("%1  PY -0.50").arg(py_m)  << Qt::endl;
-    int px_p = nextId++; out << QString("%1  PX  0.50").arg(px_p)  << Qt::endl;
-    int px_m = nextId++; out << QString("%1  PX -0.50").arg(px_m)  << Qt::endl;
+  // nuc and cyto pairs
+  for (const auto &cell : cells) {
 
-    //le void
-    out << "4000   SO   500.0 $outer boundary" << Qt::endl;
+    out << QString("%1  %2 -%3  -%4")
+               .arg(cell.nucSurfId, -3)
+               .arg(nucMatNo + 1)
+               .arg(Nucdensity)
+               .arg(cell.nucSurfId)
+        << " $nucleus" << Qt::endl;
 
-    out << "\n[ C e l l ]" << Qt::endl;
-
-    QString allExcludedSurfaces = "";
-    QString domainsREG = "";
-    int cellCounter = 0;
-
-    double Cytodensity=0.0;
-    double Nucdensity=0.0;
-    double Bufdensity = 0.0;
-    double Airdensity = -0.00129;
-    static const double densities[] = {1.06, 1.00, 1.92, 0.95, 1.127, 1.45, 1.05};
-    const int num_materials = sizeof(densities) / sizeof(densities[0]);
-
-    //qDebug() << num_materials << Qt::endl;
-
-    if (cytoMatNo >= 0 && cytoMatNo < num_materials) {
-        Cytodensity = densities[cytoMatNo];
-    }
-
-    if (nucMatNo >= 0 && nucMatNo < num_materials) {
-        Nucdensity = densities[nucMatNo];
-    }
-
-    if (buffMatNo >= 0 && buffMatNo < num_materials) {
-        Bufdensity = densities[buffMatNo];
-    }
-
-    //nuc and cyto pairs
-    for (const auto& cell : cells) {
-
-        out << QString("%1  %2 -%3  -%4")
-                   .arg(cell.nucSurfId, -3)
-                   .arg(nucMatNo+1)
-                   .arg(Nucdensity)
-                   .arg(cell.nucSurfId)
-            << " $nucleus" << Qt::endl;
-
-
-        out << QString("%1  %2 -%3 (-%4 %5) #%6")
-                   .arg(cell.cellSurfId, -3)
-                   .arg(cytoMatNo+1)
-                   .arg(Cytodensity)
-                   .arg(cell.cellSurfId)
-                   .arg(pz_top)
-                   .arg(cell.nucSurfId)
-            << " $cytoplasm" << Qt::endl;
-
-        //line break with 5 space to tackle phist limit
-        if (cellCounter > 0 && cellCounter % 8 == 0) {
-            allExcludedSurfaces += "\n     ";
-            domainsREG += "\n     ";
-        }
-
-
-        allExcludedSurfaces += QString(" #%1 #%2").arg(cell.cellSurfId).arg(cell.nucSurfId);
-        domainsREG +=  QString(" %1 %2").arg(cell.cellSurfId).arg(cell.nucSurfId);
-        cellCounter++;
-    }
-
-    out << QString("3000  %1 -%2  (-%3 %4)")
-               .arg(buffMatNo+1)
-               .arg(Bufdensity)
-               .arg(containerId)
-               .arg(pz_top) << allExcludedSurfaces << Qt::endl;
-
-    //le buffer
-    out << QString("3001  %1 -%2 %3 -%4 -%5 %6 -%7 %8")
-               .arg(buffMatNo+1)
-               .arg(Bufdensity)
-               .arg(pz_bottom)
+    out << QString("%1  %2 -%3 (-%4 %5) #%6")
+               .arg(cell.cellSurfId, -3)
+               .arg(cytoMatNo + 1)
+               .arg(Cytodensity)
+               .arg(cell.cellSurfId)
                .arg(pz_top)
-               .arg(py_p)
-               .arg(py_m)
-               .arg(px_p)
-               .arg(px_m) << Qt::endl;
+               .arg(cell.nucSurfId)
+        << " $cytoplasm" << Qt::endl;
 
-    out << "4001 " << num_materials+1 << " " << Airdensity <<" -4000 " << allExcludedSurfaces << " #3000 #3001" << Qt::endl;
-    //the void
-    out << "4000  -1  4000" << Qt::endl;
+    // line break with 5 space to tackle phist limit
+    if (cellCounter > 0 && cellCounter % 8 == 0) {
+      allExcludedSurfaces += "\n     ";
+      domainsREG += "\n     ";
+    }
 
+    allExcludedSurfaces +=
+        QString(" #%1 #%2").arg(cell.cellSurfId).arg(cell.nucSurfId);
+    domainsREG += QString(" %1 %2").arg(cell.cellSurfId).arg(cell.nucSurfId);
+    cellCounter++;
+  }
 
-    if(ui->checkBox_3->isChecked()){
+  out << QString("3000  %1 -%2  (-%3 %4)")
+             .arg(buffMatNo + 1)
+             .arg(Bufdensity)
+             .arg(containerId)
+             .arg(pz_top)
+      << allExcludedSurfaces << Qt::endl;
+
+  // le buffer
+  out << QString("3001  %1 -%2 %3 -%4 -%5 %6 -%7 %8")
+             .arg(buffMatNo + 1)
+             .arg(Bufdensity)
+             .arg(pz_bottom)
+             .arg(pz_top)
+             .arg(py_p)
+             .arg(py_m)
+             .arg(px_p)
+             .arg(px_m)
+      << Qt::endl;
+
+  out << "4001 " << num_materials + 1 << " " << Airdensity << " -4000 "
+      << allExcludedSurfaces << " #3000 #3001" << Qt::endl;
+  // the void
+  out << "4000  -1  4000" << Qt::endl;
+
+  if (ui->checkBox_3->isChecked()) {
 
     out << "\n[ T - Gshow ]" << Qt::endl;
     out << "title = generated cell array" << Qt::endl;
     out << "mesh =  xyz" << Qt::endl;
     out << "x-type = 2" << Qt::endl;
     out << "xmin = " << -halfGrid << Qt::endl;
-    out << "xmax = " <<  halfGrid << Qt::endl;
+    out << "xmax = " << halfGrid << Qt::endl;
     out << "nx = 200" << Qt::endl;
     out << "y-type = 2" << Qt::endl;
     out << "ymin = " << -halfGrid << Qt::endl;
@@ -435,48 +431,20 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << "ny = 200" << Qt::endl;
     out << " z-type = 1" << Qt::endl;
     out << "nz = 1" << Qt::endl;
-    out << "0.000 " << (majorZ+bufH)/40. << Qt::endl;
+    out << "0.000 " << (majorZ + bufH) / 40. << Qt::endl;
     out << "axis = xy" << Qt::endl;
     out << "file = geometry_topview.out" << Qt::endl;
     out << "output = 6" << Qt::endl;
     out << "epsout = 1" << Qt::endl;
-    }
+  }
 
-    if(ui->checkBox_2->isChecked()){
-        out << "\n[ T - Track ]" << Qt::endl;
-        out << "title = track on cell array" << Qt::endl;
-        out << "mesh =  xyz" << Qt::endl;
-        out << "x-type = 2" << Qt::endl;
-        out << "xmin = " << -halfGrid << Qt::endl;
-        out << "xmax = " <<  halfGrid << Qt::endl;
-        out << "nx = 200" << Qt::endl;
-        out << "y-type = 2" << Qt::endl;
-        out << "ymin = " << -halfGrid << Qt::endl;
-        out << "ymax = " << halfGrid << Qt::endl;
-        out << "ny = 200" << Qt::endl;
-        out << " z-type = 1" << Qt::endl;
-        out << "nz = 1" << Qt::endl;
-        out << "0.000 " << majorZ+bufH << Qt::endl;
-        out << "axis = xy" << Qt::endl;
-        out << "file = tracks.out" << Qt::endl;
-        out << "e-type = 3" << Qt::endl;
-        out << "emin = 1.0E-3" << Qt::endl;
-        out << "emax = " << e0 << Qt::endl;
-        out << "ne = 1" << Qt::endl;
-        out << "part = all" << Qt::endl;
-        out << "material = all" << Qt::endl;
-        out << "epsout = 1" << Qt::endl;
-
-    }
-
-    if(ui->checkBox->isChecked()){
-
-  out << "\n[ T - Deposit ]" << Qt::endl;
-    out << "title = dose on cell array" << Qt::endl;
+  if (ui->checkBox_2->isChecked()) {
+    out << "\n[ T - Track ]" << Qt::endl;
+    out << "title = track on cell array" << Qt::endl;
     out << "mesh =  xyz" << Qt::endl;
     out << "x-type = 2" << Qt::endl;
     out << "xmin = " << -halfGrid << Qt::endl;
-    out << "xmax = " <<  halfGrid << Qt::endl;
+    out << "xmax = " << halfGrid << Qt::endl;
     out << "nx = 200" << Qt::endl;
     out << "y-type = 2" << Qt::endl;
     out << "ymin = " << -halfGrid << Qt::endl;
@@ -484,7 +452,34 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << "ny = 200" << Qt::endl;
     out << " z-type = 1" << Qt::endl;
     out << "nz = 1" << Qt::endl;
-    out << "0.000 " << majorZ+bufH << Qt::endl;
+    out << "0.000 " << majorZ + bufH << Qt::endl;
+    out << "axis = xy" << Qt::endl;
+    out << "file = tracks.out" << Qt::endl;
+    out << "e-type = 3" << Qt::endl;
+    out << "emin = 1.0E-3" << Qt::endl;
+    out << "emax = " << e0 << Qt::endl;
+    out << "ne = 1" << Qt::endl;
+    out << "part = all" << Qt::endl;
+    out << "material = all" << Qt::endl;
+    out << "epsout = 1" << Qt::endl;
+  }
+
+  if (ui->checkBox->isChecked()) {
+
+    out << "\n[ T - Deposit ]" << Qt::endl;
+    out << "title = dose on cell array" << Qt::endl;
+    out << "mesh =  xyz" << Qt::endl;
+    out << "x-type = 2" << Qt::endl;
+    out << "xmin = " << -halfGrid << Qt::endl;
+    out << "xmax = " << halfGrid << Qt::endl;
+    out << "nx = 200" << Qt::endl;
+    out << "y-type = 2" << Qt::endl;
+    out << "ymin = " << -halfGrid << Qt::endl;
+    out << "ymax = " << halfGrid << Qt::endl;
+    out << "ny = 200" << Qt::endl;
+    out << " z-type = 1" << Qt::endl;
+    out << "nz = 1" << Qt::endl;
+    out << "0.000 " << majorZ + bufH << Qt::endl;
     out << "axis = xy" << Qt::endl;
     out << "file = top_view_deposit.out" << Qt::endl;
     out << "part = all" << Qt::endl;
@@ -493,28 +488,30 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << "unit = 2" << Qt::endl;
     out << "epsout = 1" << Qt::endl;
 
-
     out << Qt::scientific;
-    out.setRealNumberPrecision(3); // good enough for cells in micron range since will be written as cm
+    out.setRealNumberPrecision(
+        3); // good enough for cells in micron range since will be written as cm
 
-  out << "\n[ T - Deposit ]" << Qt::endl;
+    out << "\n[ T - Deposit ]" << Qt::endl;
     out << "title = dose in cell constituents" << Qt::endl;
     out << "mesh = reg" << Qt::endl;
     out << "reg = " << domainsREG << Qt::endl;
     out << "volume" << Qt::endl;
     out << "reg      vol" << Qt::endl;
 
-    for (const auto& cell : cells) {
-        //out << cell.cellSurfId << "   " << M_PI*(2/3)*(cell.nrx*cell.nrx*cell.nrz) << Qt::endl;
-        //out << cell.nucSurfId  << "   " << M_PI*(2/3)*(cell.rx*cell.rx*cell.rz) << Qt::endl;
+    for (const auto &cell : cells) {
+      // out << cell.cellSurfId << "   " <<
+      // M_PI*(2/3)*(cell.nrx*cell.nrx*cell.nrz) << Qt::endl; out <<
+      // cell.nucSurfId  << "   " << M_PI*(2/3)*(cell.rx*cell.rx*cell.rz) <<
+      // Qt::endl;
 
+      double nucVol = M_PI * (4.0 / 3.0) * (cell.nrx * cell.nrx * cell.nrz);
+      double cellVol =
+          M_PI * (2.0 / 3.0) * (cell.rx * cell.rx * cell.rz) -
+          nucVol; // to be precise remove out volume of nucleus from cytoplasm
 
-        double nucVol  = M_PI * (4.0 / 3.0) * (cell.nrx * cell.nrx * cell.nrz);
-        double cellVol = M_PI * (2.0 / 3.0) * (cell.rx * cell.rx * cell.rz) - nucVol; //to be precise remove out volume of nucleus from cytoplasm
-
-        out << cell.cellSurfId << "   " << cellVol << Qt::endl;
-        out << cell.nucSurfId  << "   " << nucVol  << Qt::endl;
-
+      out << cell.cellSurfId << "   " << cellVol << Qt::endl;
+      out << cell.nucSurfId << "   " << nucVol << Qt::endl;
     }
 
     out << "axis = reg" << Qt::endl;
@@ -524,399 +521,370 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas, const
     out << "material = all" << Qt::endl;
     out << "output = dose" << Qt::endl;
     out << "epsout = 0" << Qt::endl;
+  }
 
-    }
-
-    out << "\n[ E n d ]";
-
+  out << "\n[ E n d ]";
 }
 
+void cellmaker::on_pushButton_clicked() {
 
-void cellmaker::on_pushButton_clicked()
-{
+  ui->textBrowser->setText("");
+  QGraphicsScene *scene = new QGraphicsScene();
 
-    ui->textBrowser->setText("");
-    QGraphicsScene *scene = new QGraphicsScene();
+  ui->graphicsView->setScene(scene);
 
-    ui->graphicsView->setScene(scene);
+  ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 
-    ui->graphicsView->setRenderHint(QPainter::Antialiasing);
+  QGraphicsScene *scene2 = new QGraphicsScene();
+  ui->graphicsView_2->setScene(scene2);
+  ui->graphicsView_2->setRenderHint(QPainter::Antialiasing);
 
+  QRandomGenerator *generator = QRandomGenerator::global();
 
-    QGraphicsScene *scene2 = new QGraphicsScene();
-    ui->graphicsView_2->setScene(scene2);
-    ui->graphicsView_2->setRenderHint(QPainter::Antialiasing);
+  // scene->addRect(QRectF(0, 0, 100, 100), pen, brush);
+  // scene->addEllipse(QRectF(150, 0, 100, 50, Qt::red, Qt::yellow));
+  // scene->addEllipse(150,0,100,50,Qt::red, Qt::yellow);
+  // QRectF rect(0, 0, 50, 50); // Rectangle defined by (x, y, width, height)
 
-    QRandomGenerator *generator = QRandomGenerator::global();
+  QString cellNoString = ui->lineEdit_6->text();
+  QString cellSizeString = ui->lineEdit->text();
+  QString nucleusSizeString = ui->lineEdit_10->text();
+  QString CellPitchString = ui->lineEdit_11->text();
 
-    //scene->addRect(QRectF(0, 0, 100, 100), pen, brush);
-    //scene->addEllipse(QRectF(150, 0, 100, 50, Qt::red, Qt::yellow));
-    //scene->addEllipse(150,0,100,50,Qt::red, Qt::yellow);
-    //QRectF rect(0, 0, 50, 50); // Rectangle defined by (x, y, width, height)
+  QString maxcas = ui->lineEdit_12->text();
+  QString maxbch = ui->lineEdit_13->text();
 
-    QString cellNoString = ui->lineEdit_6->text();
-    QString cellSizeString = ui->lineEdit->text();
-    QString nucleusSizeString = ui->lineEdit_10->text();
-    QString CellPitchString = ui->lineEdit_11->text();
+  int cellNo = cellNoString.toInt();
+  double cellSize = cellSizeString.toDouble();
+  double nucleusSize = nucleusSizeString.toDouble();
+  double CellPitch = CellPitchString.toDouble();
 
-    QString maxcas = ui->lineEdit_12->text();
-    QString maxbch = ui->lineEdit_13->text();
+  QString sourceType = ui->comboBox_3->currentText();
 
-    int cellNo = cellNoString.toInt();
-    double cellSize = cellSizeString.toDouble();
-    double nucleusSize = nucleusSizeString.toDouble();
-    double CellPitch = CellPitchString.toDouble();
+  // ui->textBrowser->insertPlainText(sourceType);
 
-    QString sourceType = ui->comboBox_3->currentText();
+  int cytoMatNo = ui->comboBox_4->currentIndex();
 
-    //ui->textBrowser->insertPlainText(sourceType);
+  // qDebug() << matNo << Qt::endl;
 
-    int cytoMatNo = ui->comboBox_4->currentIndex();
+  int nucMatNo = ui->comboBox_5->currentIndex();
+  int buffMatNo = ui->comboBox_6->currentIndex();
 
-   //qDebug() << matNo << Qt::endl;
+  // int airMatNo = ui->comboBox_7->currentIndex();
+  // int cellNo = 3;
+  // double cellSize = 80.0;  //diameter of each cell
+  // double nucleusSize = 10.0;  //diameter of nucleus
 
-    int nucMatNo = ui->comboBox_5->currentIndex();
-    int buffMatNo = ui->comboBox_6->currentIndex();
+  QPen cellOutline(Qt::blue);
+  QBrush cellFill(Qt::cyan);
 
-    //int airMatNo = ui->comboBox_7->currentIndex();
-    //int cellNo = 3;
-    //double cellSize = 80.0;  //diameter of each cell
-    //double nucleusSize = 10.0;  //diameter of nucleus
+  QPen nucleusOutline(Qt::yellow);
+  QBrush nucleusFill(Qt::red);
 
-    QPen cellOutline(Qt::blue);
-    QBrush cellFill(Qt::cyan);
+  double spacing = cellSize + CellPitch;
 
-    QPen nucleusOutline(Qt::yellow);
-    QBrush nucleusFill(Qt::red);
+  // QList<CellData> cellList;
+  // int cellCounter = 1;
+  QList<CompleteCell> cellList;
+  // int totalCells = cellNo * cellNo;
+  QString majorZString = ui->lineEdit_5->text();
 
-    double spacing = cellSize+ CellPitch;
+  QString majorXString = ui->lineEdit_3->text();
+  QString majorYString = ui->lineEdit_4->text();
 
-   // QList<CellData> cellList;
-    //int cellCounter = 1;
-    QList<CompleteCell> cellList;
-    //int totalCells = cellNo * cellNo;
-    QString majorZString = ui->lineEdit_5->text();
+  const double majorZ = majorZString.toDouble();
 
-    QString majorXString = ui->lineEdit_3->text();
-    QString majorYString = ui->lineEdit_4->text();
+  const double majorX = majorXString.toDouble();
 
+  const double majorY = majorYString.toDouble();
 
-    const double majorZ  = majorZString.toDouble();
+  // double totalGridSize = (cellNo - 1) * spacing;
 
-    const double majorX = majorXString.toDouble();
+  // double offset = totalGridSize / 2.0;
 
-    const double majorY = majorYString.toDouble();
+  // int midIndex = cellNo / 2;
 
-    //double totalGridSize = (cellNo - 1) * spacing;
+  // double gridWidth = (cellNo - 1) * spacing;
 
-    // double offset = totalGridSize / 2.0;
+  double totalSpan = (cellNo - 1) * spacing;
+  double halfSpan = totalSpan / 2.0;
 
-    //int midIndex = cellNo / 2;
+  QString cytoplasmType = ui->comboBox->currentText();
+  double userRadius =
+      ui->spinBoxRandomRadius
+          ->value();              // radius within which cells may be displaced
+  const int maxAttempts = 1000;   // safety limit for placement tries
+  QVector<QPointF> placedCenters; // stores already placed cell centres
+  bool placementOk = true;        // will become false if we cannot place a cell
 
-    //double gridWidth = (cellNo - 1) * spacing;
+  for (int i = 0; i < cellNo && placementOk; ++i) {
+    for (int j = 0; j < cellNo && placementOk; ++j) {
 
-    double totalSpan = (cellNo - 1) * spacing;
-    double halfSpan = totalSpan / 2.0;
+      // to fix assymetry issue for even number of cell n^2
+      // double cx = (i * spacing) - (gridWidth / 2.0);
+      // double cy = (j * spacing) - (gridWidth / 2.0);
 
-    QString cytoplasmType = ui->comboBox->currentText();
-    double userRadius   = ui->spinBoxRandomRadius->value();   // radius within which cells may be displaced
-    const int maxAttempts = 1000;                           // safety limit for placement tries
-    QVector<QPointF> placedCenters;                         // stores already placed cell centres
-    bool placementOk = true;                                // will become false if we cannot place a cell
+      double baseCx = (i * spacing) - halfSpan;
+      double baseCy = (j * spacing) - halfSpan;
 
-    for (int i = 0; i < cellNo && placementOk; ++i) {
-        for (int j = 0; j < cellNo && placementOk; ++j) {
+      // calculate Centered Coordinates
+      // this ensures the central cell (i=midIndex, j=midIndex) is at 0,0
+      // double cx = (i - midIndex) * spacing;
+      // double cy = (j - midIndex) * spacing;
 
-            //to fix assymetry issue for even number of cell n^2
-            //double cx = (i * spacing) - (gridWidth / 2.0);
-            //double cy = (j * spacing) - (gridWidth / 2.0);
+      double cz = 0.0;
 
-            double baseCx = (i * spacing) - halfSpan;
-            double baseCy = (j * spacing) - halfSpan;
+      // randomize cells aka cytos
 
+      double cx = baseCx;
+      double cy = baseCy;
 
-            // calculate Centered Coordinates
-            //this ensures the central cell (i=midIndex, j=midIndex) is at 0,0
-            // double cx = (i - midIndex) * spacing;
-            // double cy = (j - midIndex) * spacing;
+      if (cytoplasmType == "Random") {
+        int attempts = 0;
+        bool placed = false;
 
-            double cz = 0.0;
+        while (attempts < maxAttempts && !placed) {
+          // pick a random direction
 
-            //randomize cells aka cytos
+          double thetaPos = 2.0 * M_PI * generator->generateDouble();
+          // pick a random distance that stays inside the user‑defined radius
 
-            double cx = baseCx;
-            double cy = baseCy;
+          double rPos =
+              userRadius *
+              std::sqrt(
+                  generator
+                      ->generateDouble()); // sqrt will give non-uniform
+                                           // distb.values close to 1 than 0
+          // candidate centre
 
-            if (cytoplasmType == "Random") {
-                int attempts = 0;
-                bool placed   = false;
+          double candCx = baseCx + rPos * std::cos(thetaPos);
 
-                while (attempts < maxAttempts && !placed) {
-                    // pick a random direction
+          double candCy = baseCy + rPos * std::sin(thetaPos);
 
-                    double thetaPos = 2.0 * M_PI * generator->generateDouble();
-                    // pick a random distance that stays inside the user‑defined radius
-
-                    double rPos = userRadius * std::sqrt(generator->generateDouble()); //sqrt will give non-uniform distb.values close to 1 than 0
-                    // candidate centre
-
-                    double candCx = baseCx + rPos * std::cos(thetaPos);
-
-                    double candCy = baseCy + rPos * std::sin(thetaPos);
-
-                    // check overlap with all previously placed cells
-                    bool overlap = false;
-                    for (const QPointF &p : placedCenters) {
-                        double dx = candCx - p.x();
-                        double dy = candCy - p.y();
-                        // each cell radius = cellSize/2, so sum of radii = cellSize
-                        if (std::hypot(dx, dy) < cellSize) {
-                            overlap = true;
-                            break;
-                        }
-                    }
-                    //---------------------------------------------------------------------
-
-                    if (!overlap) {
-                        cx = candCx;
-                        cy = candCy;
-                        placed = true;
-                        placedCenters.append(QPointF(cx, cy));
-                    }
-                    ++attempts;
-                }
-
-                if (!placed) {
-                    ui->textBrowser->setText(
-                        tr("<font color='red'>Error: Unable to place cells without overlap within the given radius. Run again to randomize.</font>"));
-                    placementOk = false;
-                    break;          // break inner loop; outer loop will also stop because placementOk==false
-                }
-            } else {
-                // no random displacement – keep the regular grid position
-                placedCenters.append(QPointF(cx, cy));
-
+          // check overlap with all previously placed cells
+          bool overlap = false;
+          for (const QPointF &p : placedCenters) {
+            double dx = candCx - p.x();
+            double dy = candCy - p.y();
+            // each cell radius = cellSize/2, so sum of radii = cellSize
+            if (std::hypot(dx, dy) < cellSize) {
+              overlap = true;
+              break;
             }
+          }
+          //---------------------------------------------------------------------
 
-            // draw cytoplasm in QGraphicsScene
-            // subtract cellSize/2.0 to define the top left
-            QRectF cellRect(cx - cellSize / 2.0,
-                            cy - cellSize / 2.0,
-                            cellSize,
-                            cellSize);
-            scene->addEllipse(cellRect, cellOutline, cellFill);
-
-            //calculate and Draw Nucleus (Random Position inside cell)
-            double theta = 2.0 * M_PI * generator->generateDouble();
-            double r = (cellSize / 2.0 - nucleusSize / 2.0) *
-                       std::sqrt(generator->generateDouble());
-            double nx = cx + r * std::cos(theta);
-            double ny = cy + r * std::sin(theta);
-            QRectF nucleusRect(nx - nucleusSize / 2.0,
-                               ny - nucleusSize / 2.0,
-                               nucleusSize,
-                               nucleusSize);
-            scene->addEllipse(nucleusRect, nucleusOutline, nucleusFill);
-
-            // data for cell cytoplasm
-            //CellData c;
-            //c.x = cx;
-            //c.y = cy;
-            //c.z = cz;
-            //c.rx = cellSize / 2.0; // radius of minor axis
-            //c.rz = majorZ;         // major axis vector magnitude (vertical height)
-            //cellList.append(c);
-
-
-            CompleteCell cc;
-            //cytoplasm center (Grid)
-            cc.x = cx; //(i - midIndex) * spacing;
-            cc.y = cy; //(j - midIndex) * spacing;
-            cc.z = cz; //0.0; // Base of the semi‑ellipsoid
-            cc.rx = cellSize / 2.0;
-            cc.rz = majorZ;          // Height of the cell
-            cc.majorX = majorX;
-            cc.majorY = majorY;
-            //the following was simple check, issue is cell shape is complex
-            //it when nucleus moves up the dome it can fall outside
-
-            /*
-        //random nuclues pos.
-        double maxLateralOffset = cc.rx - (nucleusSize / 2.0) - 0.00001;
-        theta = 2.0 _M_PI_ generator->generateDouble();
-        r = maxLateralOffset * sqrt(generator->generateDouble());
-        cc.nx = cc.x + r * cos(theta);
-        cc.ny = cc.y + r * sin(theta);
-        cc.nrz = nucleusSize / 4.0;
-        cc.nrx = nucleusSize / 2.0;
-        cc.nz = cc.nrz + (cc.rz _0.5_ generator->generateDouble());
-        */
-
-            cc.nrx = nucleusSize / 2.0;
-            cc.nrz = nucleusSize / 4.0;
-
-            double minNz = cc.nrz + 0.000001;
-
-            //double maxNz = cc.rz - cc.nrz - 0.000001;
-            //calculate the absolute highest the nucleus center can go without go through the dome
-            double maxNz = cc.rz * std::sqrt(1.0 - std::pow(cc.nrx / cc.rx, 2)) - cc.nrz - 0.000001;
-
-            if (maxNz < minNz || cc.nrx >= cc.rx) {
-                ui->textBrowser->setText(
-                    tr("<font color='red'>Error: Nucleus is too large to fit inside the cell domain. Please reduce nucleus size or increase cell size.</font>")
-                    );
-                placementOk = false;
-                //break; //stop generating cells
-            }
-
-            //safe rand placement
-            cc.nz = minNz + (maxNz - minNz) * generator->generateDouble();
-
-            //calculate safe lateral offset based on the highest point of the nucleus
-            double topOfNucleusZ = cc.nz + cc.nrz;
-            double safeCellRx = cc.rx * std::sqrt(1.0 - std::pow(topOfNucleusZ / cc.rz, 2));
-
-            double maxLateralOffset = safeCellRx - cc.nrx - 0.000001;
-            if (maxLateralOffset < 0) maxLateralOffset = 0;
-
-           // cc.nz = minNz + (maxNz - minNz) * generator->generateDouble();
-
-            //double topOfNucleusZ = cc.nz + cc.nrz;
-
-            //double safeCellRx = cc.rx * std::sqrt(1.0 - std::pow(topOfNucleusZ / cc.rz, 2));
-
-            //double maxLateralOffset = safeCellRx - cc.nrx - 0.000001;
-
-            //if (maxLateralOffset < 0) maxLateralOffset = 0;
-
-            //double localCellRx = cc.rx *
-            //                     std::sqrt(1.0 - std::pow(cc.nz / cc.rz, 2));
-            //maxLateralOffset = localCellRx - cc.nrx - 0.000001;
-            //if (maxLateralOffset < 0) maxLateralOffset = 0;
-
-
-            theta = 2.0 * M_PI * generator->generateDouble();
-            r = maxLateralOffset * std::sqrt(generator->generateDouble());
-            cc.nx = cc.x + r * std::cos(theta);
-            cc.ny = cc.y + r * std::sin(theta);
-
-            //ids
-            cc.cellSurfId = cellList.size() + 1;
-            cc.nucSurfId  = cc.cellSurfId + (cellNo * cellNo);
-            cellList.append(cc);
+          if (!overlap) {
+            cx = candCx;
+            cy = candCy;
+            placed = true;
+            placedCenters.append(QPointF(cx, cy));
+          }
+          ++attempts;
         }
+
+        if (!placed) {
+          ui->textBrowser->setText(tr(
+              "<font color='red'>Error: Unable to place cells without overlap "
+              "within the given radius. Run again to randomize.</font>"));
+          placementOk = false;
+          break; // break inner loop; outer loop will also stop because
+                 // placementOk==false
+        }
+      } else {
+        // no random displacement – keep the regular grid position
+        placedCenters.append(QPointF(cx, cy));
+      }
+
+      // draw cytoplasm in QGraphicsScene
+      // subtract cellSize/2.0 to define the top left
+      QRectF cellRect(cx - cellSize / 2.0, cy - cellSize / 2.0, cellSize,
+                      cellSize);
+      scene->addEllipse(cellRect, cellOutline, cellFill);
+
+      // calculate and Draw Nucleus (Random Position inside cell)
+      double theta = 2.0 * M_PI * generator->generateDouble();
+      double r = (cellSize / 2.0 - nucleusSize / 2.0) *
+                 std::sqrt(generator->generateDouble());
+      double nx = cx + r * std::cos(theta);
+      double ny = cy + r * std::sin(theta);
+      QRectF nucleusRect(nx - nucleusSize / 2.0, ny - nucleusSize / 2.0,
+                         nucleusSize, nucleusSize);
+      scene->addEllipse(nucleusRect, nucleusOutline, nucleusFill);
+
+      // data for cell cytoplasm
+      // CellData c;
+      // c.x = cx;
+      // c.y = cy;
+      // c.z = cz;
+      // c.rx = cellSize / 2.0; // radius of minor axis
+      // c.rz = majorZ;         // major axis vector magnitude (vertical height)
+      // cellList.append(c);
+
+      CompleteCell cc;
+      // cytoplasm center (Grid)
+      cc.x = cx; //(i - midIndex) * spacing;
+      cc.y = cy; //(j - midIndex) * spacing;
+      cc.z = cz; // 0.0; // Base of the semi‑ellipsoid
+      cc.rx = cellSize / 2.0;
+      cc.rz = majorZ; // Height of the cell
+      cc.majorX = majorX;
+      cc.majorY = majorY;
+      // the following was simple check, issue is cell shape is complex
+      // it when nucleus moves up the dome it can fall outside
+
+      /*
+  //random nuclues pos.
+  double maxLateralOffset = cc.rx - (nucleusSize / 2.0) - 0.00001;
+  theta = 2.0 _M_PI_ generator->generateDouble();
+  r = maxLateralOffset * sqrt(generator->generateDouble());
+  cc.nx = cc.x + r * cos(theta);
+  cc.ny = cc.y + r * sin(theta);
+  cc.nrz = nucleusSize / 4.0;
+  cc.nrx = nucleusSize / 2.0;
+  cc.nz = cc.nrz + (cc.rz _0.5_ generator->generateDouble());
+  */
+
+      cc.nrx = nucleusSize / 2.0;
+      cc.nrz = nucleusSize / 4.0;
+
+      double minNz = cc.nrz + 0.000001;
+
+      // double maxNz = cc.rz - cc.nrz - 0.000001;
+      // calculate the absolute highest the nucleus center can go without go
+      // through the dome
+      double maxNz = cc.rz * std::sqrt(1.0 - std::pow(cc.nrx / cc.rx, 2)) -
+                     cc.nrz - 0.000001;
+
+      if (maxNz < minNz || cc.nrx >= cc.rx) {
+        ui->textBrowser->setText(
+            tr("<font color='red'>Error: Nucleus is too large to fit inside "
+               "the cell domain. Please reduce nucleus size or increase cell "
+               "size.</font>"));
+        placementOk = false;
+        // break; //stop generating cells
+      }
+
+      // safe rand placement
+      cc.nz = minNz + (maxNz - minNz) * generator->generateDouble();
+
+      // calculate safe lateral offset based on the highest point of the nucleus
+      double topOfNucleusZ = cc.nz + cc.nrz;
+      double safeCellRx =
+          cc.rx * std::sqrt(1.0 - std::pow(topOfNucleusZ / cc.rz, 2));
+
+      double maxLateralOffset = safeCellRx - cc.nrx - 0.000001;
+      if (maxLateralOffset < 0)
+        maxLateralOffset = 0;
+
+      // cc.nz = minNz + (maxNz - minNz) * generator->generateDouble();
+
+      // double topOfNucleusZ = cc.nz + cc.nrz;
+
+      // double safeCellRx = cc.rx * std::sqrt(1.0 - std::pow(topOfNucleusZ /
+      // cc.rz, 2));
+
+      // double maxLateralOffset = safeCellRx - cc.nrx - 0.000001;
+
+      // if (maxLateralOffset < 0) maxLateralOffset = 0;
+
+      // double localCellRx = cc.rx *
+      //                      std::sqrt(1.0 - std::pow(cc.nz / cc.rz, 2));
+      // maxLateralOffset = localCellRx - cc.nrx - 0.000001;
+      // if (maxLateralOffset < 0) maxLateralOffset = 0;
+
+      theta = 2.0 * M_PI * generator->generateDouble();
+      r = maxLateralOffset * std::sqrt(generator->generateDouble());
+      cc.nx = cc.x + r * std::cos(theta);
+      cc.ny = cc.y + r * std::sin(theta);
+
+      // ids
+      cc.cellSurfId = cellList.size() + 1;
+      cc.nucSurfId = cc.cellSurfId + (cellNo * cellNo);
+      cellList.append(cc);
     }
+  }
 
-    QString bufHString = ui->lineEdit_2->text();
+  QString bufHString = ui->lineEdit_2->text();
 
-     const double minorX  = cellSize;
-     const double bufH    = bufHString.toDouble();     //y =cy
-     const double cx = 0.0, cy = 0.0;
+  const double minorX = cellSize;
+  const double bufH = bufHString.toDouble(); // y =cy
+  const double cx = 0.0, cy = 0.0;
 
-     QPen   outline(Qt::blue);
-     QBrush domeFill(Qt::cyan);
+  QPen outline(Qt::blue);
+  QBrush domeFill(Qt::cyan);
 
-     //top is y = cy - bufH.
-     const QRectF bufferRect(cx - minorX, cy - bufH, 2*minorX, bufH);
-     auto rectItem = scene2->addRect(bufferRect, outline, QBrush(Qt::yellow));
-     rectItem->setZValue(0);
+  // top is y = cy - bufH.
+  const QRectF bufferRect(cx - minorX, cy - bufH, 2 * minorX, bufH);
+  auto rectItem = scene2->addRect(bufferRect, outline, QBrush(Qt::yellow));
+  rectItem->setZValue(0);
 
-     //semi ellipse -- represenrs cell from side
-     const QRectF ellipseRect(cx - minorX, cy - majorZ, 2*minorX, 2*majorZ);
-     QPainterPath dome;
-     dome.moveTo(cx + minorX, cy);
-     dome.arcTo(ellipseRect, 0, 180);     //upper half
-     dome.lineTo(cx - minorX, cy);
-     dome.closeSubpath();
+  // semi ellipse -- represenrs cell from side
+  const QRectF ellipseRect(cx - minorX, cy - majorZ, 2 * minorX, 2 * majorZ);
+  QPainterPath dome;
+  dome.moveTo(cx + minorX, cy);
+  dome.arcTo(ellipseRect, 0, 180); // upper half
+  dome.lineTo(cx - minorX, cy);
+  dome.closeSubpath();
 
-     auto domeItem = scene2->addPath(dome, outline, domeFill);
-     domeItem->setZValue(1);
+  auto domeItem = scene2->addPath(dome, outline, domeFill);
+  domeItem->setZValue(1);
 
+  // ui->graphicsView_2->fitInView(scene2->itemsBoundingRect(),
+  // Qt::KeepAspectRatio);
 
-    //ui->graphicsView_2->fitInView(scene2->itemsBoundingRect(), Qt::KeepAspectRatio);
+  QString proj = ui->comboBox_2->currentText();
+  QString r0 = ui->lineEdit_8->text();
+  QString z0 = ui->lineEdit_9->text();
+  QString e0 = ui->lineEdit_7->text();
 
-     QString proj = ui->comboBox_2->currentText();
-     QString r0 = ui->lineEdit_8->text();
-     QString z0 = ui->lineEdit_9->text();
-     QString e0 = ui->lineEdit_7->text();
+  // ui->textBrowser->insertPlainText(sourceType);
 
-     //ui->textBrowser->insertPlainText(sourceType);
+  QString outputDir = qApp->applicationDirPath() + "/program_output";
 
-     QString outputDir = qApp->applicationDirPath() + "/program_output";
-
-phitsScriptGen(outputDir+"/input.i", maxcas,maxbch,sourceType,proj,r0,z0,e0,cellList,bufH, majorZ,cytoMatNo,nucMatNo,buffMatNo);
-
+  phitsScriptGen(outputDir + "/input.i", maxcas, maxbch, sourceType, proj, r0,
+                 z0, e0, cellList, bufH, majorZ, cytoMatNo, nucMatNo,
+                 buffMatNo);
 }
 
+void cellmaker::on_pushButton_4_clicked() { QApplication::quit(); }
 
-
-void cellmaker::on_pushButton_4_clicked()
-{
-    QApplication::quit();
+void cellmaker::on_pushButton_3_clicked() {
+  QMessageBox::about(
+      this, tr("CellMaker Program"),
+      tr("Generate Cell Arrays for Monte Carlo Radiation Transport Studies.\n"
+         "Developed by: Mehrdad S. Beni and Hiroshi Watabe, RARiS, Tohoku "
+         "University, JAPAN -- 2025\n"
+         "Version 1.0"));
 }
 
+void cellmaker::on_actionQuit_triggered() { on_pushButton_4_clicked(); }
 
-void cellmaker::on_pushButton_3_clicked()
-{
-    QMessageBox::about(this, tr("CellMaker Program"),
-                       tr("Generate Cell Arrays for Monte Carlo Radiation Transport Studies.\n"
-                          "Developed by: Mehrdad S. Beni and Hiroshi Watabe, RARiS, Tohoku University, JAPAN -- 2025\n"
-                          "Version 1.0"));
+void cellmaker::on_actionAbout_triggered() { on_pushButton_3_clicked(); }
+
+void cellmaker::on_actionGenerate_Cell_Array_triggered() {
+  on_pushButton_clicked();
 }
 
+void cellmaker::on_actionZoom_triggered() { on_pushButton_5_clicked(); }
 
-void cellmaker::on_actionQuit_triggered()
-{
-    on_pushButton_4_clicked();
+void cellmaker::on_actionZoom_2_triggered() { on_pushButton_6_clicked(); }
+
+void cellmaker::on_pushButton_2_clicked() {
+  QProcess *process = new QProcess(this);
+
+  QString genPath = qApp->applicationDirPath() + "/program_output";
+
+  process->setWorkingDirectory(genPath);
+
+  connect(process, &QProcess::readyRead,
+          [=]() { ui->textBrowser->append(process->readAll()); });
+
+  connect(process, qOverload<int, QProcess::ExitStatus>(&QProcess::finished),
+          [=]() {
+            ui->textBrowser->append("\n--- RUN DONE ---");
+            process->deleteLater();
+          });
+
+  process->start("phits.sh", {"input.i"});
 }
-
-
-void cellmaker::on_actionAbout_triggered()
-{
-    on_pushButton_3_clicked();
-}
-
-
-void cellmaker::on_actionGenerate_Cell_Array_triggered()
-{
-    on_pushButton_clicked();
-}
-
-
-void cellmaker::on_actionZoom_triggered()
-{
-    on_pushButton_5_clicked();
-}
-
-
-
-void cellmaker::on_actionZoom_2_triggered()
-{
-    on_pushButton_6_clicked();
-}
-
-
-void cellmaker::on_pushButton_2_clicked()
-{
-    QProcess *process = new QProcess(this);
-
-
-    QString genPath = qApp->applicationDirPath() + "/program_output";
-
-
-    process->setWorkingDirectory(genPath);
-
-    connect(process, &QProcess::readyRead, [=]() {
-        ui->textBrowser->append(process->readAll());
-    });
-
-    connect(process, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), [=]() {
-        ui->textBrowser->append("\n--- RUN DONE ---");
-        process->deleteLater();
-    });
-
-
-    process->start("phits.sh", {"input.i"});
-
-}
-
