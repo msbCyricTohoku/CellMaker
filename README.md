@@ -5,7 +5,7 @@
  |_____|___|_____|_____|_|_|_|__|__|__|__|_____|__|__|
 
  =====================================================
-  CELLMAKER :: MONTE CARLO TRANSPORT MODEL GENERATOR
+  CELLMAKER :: A toolkit for cellular level radiation dosimetry
  =====================================================
 
   [ ORIGIN ]

@@ -309,11 +309,10 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
              "%1  RPP  %2 %3 %2 %3 -1.0e-5 %4") // here i moved RPP little below
                                                 // zero so it will not overlap
                                                 // and be same surf as PZ 0.0
-                                                    .arg(containerId)
-                                                    .arg(-halfGrid)
-                                                    .arg(halfGrid)
-                                                    .arg(majorZ +
-                                                         bufH) //+5.0 i remove
+             .arg(containerId)
+             .arg(-halfGrid)
+             .arg(halfGrid)
+             .arg(majorZ + bufH) //+5.0 i remove
       << " $buffer" << Qt::endl;
 
   // the planes
