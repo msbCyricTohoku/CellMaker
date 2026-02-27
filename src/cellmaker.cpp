@@ -20,10 +20,12 @@
 #include <QVector>
 #include <QWheelEvent>
 #include <QtMath>
+#include <QIcon>
 
 cellmaker::cellmaker(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::cellmaker) {
   ui->setupUi(this);
+  setWindowIcon(QIcon(":resource/icon.png"));
 
   ui->lineEdit_6->setText("3");
 

@@ -6,5 +6,6 @@
         <file>resource/Gnome-applications-system.svg.png</file>
         <file>resource/Gnome-zoom-out.svg.png</file>
         <file>resource/Gnome-zoom-in.svg.png</file>
+        <file>resource/icon.png</file>
     </qresource>
 </RCC>
