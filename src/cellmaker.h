@@ -2,6 +2,9 @@
 #define CELLMAKER_H
 
 #include <QMainWindow>
+#include <QGraphicsScene>
+#include <QWheelEvent>
+#include "celldata.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,6 +26,7 @@ class cellmaker : public QMainWindow
         double nrx,nry,nrz;
     };
 */
+    /*
     //cell data struct
     struct CompleteCell {
         //cytoplasm body
@@ -36,7 +40,7 @@ class cellmaker : public QMainWindow
         double nrx, nrz;
         int nucSurfId;
     };
-
+*/
 
 public:
     cellmaker(QWidget *parent = nullptr);
@@ -73,7 +77,23 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+    void on_pushButton_7_clicked();
+
+    void on_checkBox_4_stateChanged(int arg1);
+
+    void on_pushButton_8_clicked();
+
 private:
     Ui::cellmaker *ui;
+    QList<CompleteCell> currentCellList;
+void renderManualCells();
+    // pointers to hold our two 2D views
+    QGraphicsScene *sceneXY = nullptr;
+    QGraphicsScene *sceneXZ = nullptr;
+
+
+protected:
+    // This intercepts the mouse wheel to allow zooming
+    bool eventFilter(QObject *obj, QEvent *event) override;
 };
 #endif // CELLMAKER_H

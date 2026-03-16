@@ -69,7 +69,7 @@
          <item row="4" column="0">
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Buffer Thickness (um):</string>
+            <string>Buffer Medium (um):</string>
            </property>
           </widget>
          </item>
@@ -274,10 +274,14 @@
          <string>View / Output Mode</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="checkBox_2">
+         <item row="5" column="0">
+          <widget class="QPushButton" name="pushButton_6">
            <property name="text">
-            <string>Track (T-Track)</string>
+            <string>XZ (Side) View</string>
+           </property>
+           <property name="icon">
+            <iconset resource="resources.qrc">
+             <normaloff>:/resource/Gnome-zoom-out.svg.png</normaloff>:/resource/Gnome-zoom-out.svg.png</iconset>
            </property>
           </widget>
          </item>
@@ -288,10 +292,10 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="4" column="0">
           <widget class="QPushButton" name="pushButton_5">
            <property name="text">
-            <string>Zoom In</string>
+            <string>XY (Top) View</string>
            </property>
            <property name="icon">
             <iconset resource="resources.qrc">
@@ -299,14 +303,10 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <widget class="QPushButton" name="pushButton_6">
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="checkBox_2">
            <property name="text">
-            <string>Zoom Out</string>
-           </property>
-           <property name="icon">
-            <iconset resource="resources.qrc">
-             <normaloff>:/resource/Gnome-zoom-out.svg.png</normaloff>:/resource/Gnome-zoom-out.svg.png</iconset>
+            <string>Track (T-Track)</string>
            </property>
           </widget>
          </item>
@@ -314,6 +314,13 @@
           <widget class="QCheckBox" name="checkBox_3">
            <property name="text">
             <string>Top View (T-Gshow)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QCheckBox" name="checkBox_4">
+           <property name="text">
+            <string>Toggle Medium</string>
            </property>
           </widget>
          </item>
@@ -338,6 +345,13 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="pushButton_7">
+           <property name="text">
+            <string>Save Model</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="pushButton_2">
            <property name="text">
             <string>Run PHITS</string>
@@ -345,6 +359,13 @@
            <property name="icon">
             <iconset resource="resources.qrc">
              <normaloff>:/resource/Gnome-utilities-terminal.svg.png</normaloff>:/resource/Gnome-utilities-terminal.svg.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_8">
+           <property name="text">
+            <string>User Manual</string>
            </property>
           </widget>
          </item>
@@ -376,14 +397,14 @@
      </layout>
     </item>
     <item row="0" column="2">
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
       <property name="spacing">
        <number>6</number>
       </property>
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Cell View</string>
+         <string>3D Cell View</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -392,9 +413,6 @@
       </item>
       <item>
        <widget class="QGraphicsView" name="graphicsView"/>
-      </item>
-      <item>
-       <widget class="QGraphicsView" name="graphicsView_2"/>
       </item>
       <item>
        <widget class="QLabel" name="label_4">
@@ -416,7 +434,7 @@
      <x>0</x>
      <y>0</y>
      <width>959</width>
-     <height>22</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
