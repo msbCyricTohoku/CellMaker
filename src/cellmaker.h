@@ -15,32 +15,6 @@ QT_END_NAMESPACE
 class cellmaker : public QMainWindow
 {
     Q_OBJECT
-/*
-    struct CellData {
-        double x, y, z;
-        double rx, ry, rz;
-    };
-
-    struct NucData {
-        double nx,ny,nz;
-        double nrx,nry,nrz;
-    };
-*/
-    /*
-    //cell data struct
-    struct CompleteCell {
-        //cytoplasm body
-        double x, y, z;
-        double rx, rz;
-        double majorX, majorY;
-        int cellSurfId;
-
-        //nucleus (inside)
-        double nx, ny, nz;
-        double nrx, nrz;
-        int nucSurfId;
-    };
-*/
 
 public:
     cellmaker(QWidget *parent = nullptr);
