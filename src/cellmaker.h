@@ -83,6 +83,12 @@ private slots:
 
     void on_pushButton_8_clicked();
 
+    void on_actionSave_Model_triggered();
+
+    void on_actionRun_PHITS_triggered();
+
+    void on_actionManual_triggered();
+
 private:
     Ui::cellmaker *ui;
     QList<CompleteCell> currentCellList;

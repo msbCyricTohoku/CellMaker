@@ -46,7 +46,7 @@ cellmaker::cellmaker(QWidget *parent)
 
   ui->lineEdit_11->setText("0");
 
-  ui->lineEdit_2->setText("100");
+  ui->lineEdit_2->setText("1000");
 
   ui->lineEdit_5->setText("20");
 
@@ -68,14 +68,14 @@ cellmaker::cellmaker(QWidget *parent)
   ui->comboBox_2->addItem("photon");
   ui->comboBox_2->addItem("alpha");
 
-  ui->lineEdit_7->setText("70");
+  ui->lineEdit_7->setText("10");
 
   ui->comboBox_3->addItem("Disk");
   ui->comboBox_3->addItem("Point");
 
-  ui->lineEdit_8->setText("1");
+  ui->lineEdit_8->setText("0.1");
 
-  ui->lineEdit_9->setText("100");
+  ui->lineEdit_9->setText("1");
 
   ui->comboBox_4->addItem("TISSUE-SOFT(ICRU-44)");
   ui->comboBox_4->addItem("WATER");
@@ -101,9 +101,11 @@ cellmaker::cellmaker(QWidget *parent)
   ui->comboBox_6->addItem("B-100-PLASTIC");
   ui->comboBox_6->addItem("MUSCLE-SKELETAL");
 
+  ui->comboBox_6->setCurrentIndex(1);
+
   ui->comboBox_7->addItem("AIR-DRY-NIST");
 
-  ui->lineEdit_12->setText("10000");
+  ui->lineEdit_12->setText("100000");
   ui->lineEdit_13->setText("10");
 
     ui->checkBox_4->setChecked(true);
@@ -136,7 +138,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
                                QList<CompleteCell> cells, double bufH,
                                double majorZ, int cytoMatNo, int nucMatNo,
                                int buffMatNo) {
-    const double micro_factor = 1; // 1E-4; // factor to scale down to micron
+    const double micro_factor = 1E-4; // factor to scale down to micron
 
     for (int i = 0; i < cells.size(); ++i) {
 
@@ -713,7 +715,7 @@ void cellmaker::on_pushButton_3_clicked() {
       tr("Generate Cell Arrays for Monte Carlo Radiation Transport Studies.\n"
          "Developed by: Mehrdad S. Beni and Hiroshi Watabe, RARiS, Tohoku "
          "University, JAPAN -- 2026\n"
-         "Version 1.0"));
+         "Version 1.0.0"));
 }
 
 void cellmaker::on_actionQuit_triggered() { on_pushButton_4_clicked(); }
@@ -1066,3 +1068,21 @@ void cellmaker::renderManualCells() {
     ui->graphicsView->fitInView(sceneXY->itemsBoundingRect(), Qt::KeepAspectRatio);
     ui->graphicsView->scale(0.9, 0.9);
 }
+
+void cellmaker::on_actionSave_Model_triggered()
+{
+    on_pushButton_7_clicked();
+}
+
+
+void cellmaker::on_actionRun_PHITS_triggered()
+{
+    on_pushButton_2_clicked();
+}
+
+
+void cellmaker::on_actionManual_triggered()
+{
+    on_pushButton_8_clicked();
+}
+

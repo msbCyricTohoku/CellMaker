@@ -4,8 +4,10 @@
         <file>resource/Gnome-help-contents.svg.png</file>
         <file>resource/Gnome-utilities-terminal.svg.png</file>
         <file>resource/Gnome-applications-system.svg.png</file>
-        <file>resource/Gnome-zoom-out.svg.png</file>
-        <file>resource/Gnome-zoom-in.svg.png</file>
         <file>resource/icon.png</file>
+        <file>resource/Gnome-address-book-new.svg.png</file>
+        <file>resource/Gnome-document-save-as.svg.png</file>
+        <file>resource/Gnome-object-flip-horizontal.svg.png</file>
+        <file>resource/Gnome-object-flip-vertical.svg.png</file>
     </qresource>
 </RCC>

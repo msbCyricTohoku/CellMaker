@@ -129,7 +129,7 @@
             <number>10000</number>
            </property>
            <property name="value">
-            <number>10</number>
+            <number>20</number>
            </property>
           </widget>
          </item>
@@ -281,7 +281,7 @@
            </property>
            <property name="icon">
             <iconset resource="resources.qrc">
-             <normaloff>:/resource/Gnome-zoom-out.svg.png</normaloff>:/resource/Gnome-zoom-out.svg.png</iconset>
+             <normaloff>:/resource/Gnome-object-flip-horizontal.svg.png</normaloff>:/resource/Gnome-object-flip-horizontal.svg.png</iconset>
            </property>
           </widget>
          </item>
@@ -299,7 +299,7 @@
            </property>
            <property name="icon">
             <iconset resource="resources.qrc">
-             <normaloff>:/resource/Gnome-zoom-in.svg.png</normaloff>:/resource/Gnome-zoom-in.svg.png</iconset>
+             <normaloff>:/resource/Gnome-object-flip-vertical.svg.png</normaloff>:/resource/Gnome-object-flip-vertical.svg.png</iconset>
            </property>
           </widget>
          </item>
@@ -349,6 +349,10 @@
            <property name="text">
             <string>Save Model</string>
            </property>
+           <property name="icon">
+            <iconset resource="resources.qrc">
+             <normaloff>:/resource/Gnome-document-save-as.svg.png</normaloff>:/resource/Gnome-document-save-as.svg.png</iconset>
+           </property>
           </widget>
          </item>
          <item>
@@ -366,6 +370,10 @@
           <widget class="QPushButton" name="pushButton_8">
            <property name="text">
             <string>User Manual</string>
+           </property>
+           <property name="icon">
+            <iconset resource="resources.qrc">
+             <normaloff>:/resource/Gnome-address-book-new.svg.png</normaloff>:/resource/Gnome-address-book-new.svg.png</iconset>
            </property>
           </widget>
          </item>
@@ -404,7 +412,7 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>3D Cell View</string>
+         <string>Interactive Cell View</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -450,11 +458,19 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="actionSave_Model"/>
     <addaction name="actionZoom"/>
     <addaction name="actionZoom_2"/>
    </widget>
+   <widget class="QMenu" name="menuUser_Manual">
+    <property name="title">
+     <string>User Manual</string>
+    </property>
+    <addaction name="actionManual"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuUser_Manual"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionGenerate_Cell_Array">
@@ -508,10 +524,10 @@
   <action name="actionZoom">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/resource/Gnome-zoom-in.svg.png</normaloff>:/resource/Gnome-zoom-in.svg.png</iconset>
+     <normaloff>:/resource/Gnome-object-flip-vertical.svg.png</normaloff>:/resource/Gnome-object-flip-vertical.svg.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom+</string>
+    <string>XY (Top) View</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+=</string>
@@ -520,13 +536,37 @@
   <action name="actionZoom_2">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/resource/Gnome-zoom-out.svg.png</normaloff>:/resource/Gnome-zoom-out.svg.png</iconset>
+     <normaloff>:/resource/Gnome-object-flip-horizontal.svg.png</normaloff>:/resource/Gnome-object-flip-horizontal.svg.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom-</string>
+    <string>XZ (Side) View</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+-</string>
+   </property>
+  </action>
+  <action name="actionSave_Model">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resource/Gnome-document-save-as.svg.png</normaloff>:/resource/Gnome-document-save-as.svg.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save Model</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionManual">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resource/Gnome-address-book-new.svg.png</normaloff>:/resource/Gnome-address-book-new.svg.png</iconset>
+   </property>
+   <property name="text">
+    <string>Manual</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
    </property>
   </action>
  </widget>
