@@ -28,8 +28,11 @@
   Active // Open Source
 
   [USER MANUAL]
-  User Manual included in the program. Please check `Releases` for Windows Executable.
+  User Manual included in the program. 
 
- =====================================================
+  [WINDOWS EXE]
+  Please check `Releases` for Windows Executable.
+
+ =======================================================================
   (c) RARiS Nuclear Lab., Tohoku University, Japan. All rights reserved.
- =====================================================
+ =======================================================================
