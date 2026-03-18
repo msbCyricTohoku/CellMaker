@@ -44,7 +44,7 @@ private slots:
 
     void phitsScriptGen(const QString &path, const QString &maxcas, const QString &maxbch, const QString sourceType,
                         const QString proj, const QString r0, const QString z0, const QString e0,
-                        QList<CompleteCell> cells, double bufH, double majorZ,int cytoMatNo,int nucMatNo,int buffMatNo);
+                        QList<CompleteCell> cells, double bufH, double majorZ,int cytoMatNo,int nucMatNo,int buffMatNo, bool is3DMode);
 
 
 
@@ -66,6 +66,8 @@ private slots:
 private:
     Ui::cellmaker *ui;
     QList<CompleteCell> currentCellList;
+    bool is3DMode = false;
+
 void renderManualCells();
     // pointers to hold our two 2D views
     QGraphicsScene *sceneXY = nullptr;
@@ -73,7 +75,7 @@ void renderManualCells();
 
 
 protected:
-    // This intercepts the mouse wheel to allow zooming
+    // mouse wheel to allow zooming
     bool eventFilter(QObject *obj, QEvent *event) override;
 };
 #endif // CELLMAKER_H

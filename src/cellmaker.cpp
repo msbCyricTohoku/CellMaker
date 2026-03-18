@@ -31,82 +31,81 @@
 
 cellmaker::cellmaker(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::cellmaker) {
-  ui->setupUi(this);
+    ui->setupUi(this);
 
-    // Enable click-and-drag panning
+    //panning with drag
     ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
-    // Tell the view to listen to our mouse wheel event filter
+
     ui->graphicsView->viewport()->installEventFilter(this);
 
-  ui->lineEdit_6->setText("3");
+    ui->lineEdit_6->setText("3");
 
-  ui->lineEdit->setText("30");
+    ui->lineEdit->setText("30");
 
-  ui->lineEdit_10->setText("10");
+    ui->lineEdit_10->setText("10");
 
-  ui->lineEdit_11->setText("0");
+    ui->lineEdit_11->setText("0");
 
-  ui->lineEdit_2->setText("1000");
+    ui->lineEdit_2->setText("10");
 
-  ui->lineEdit_5->setText("20");
+    //now removed ui->lineEdit_5->setText("20");
 
-  ui->checkBox->setChecked(true);
-  ui->checkBox_2->setChecked(false);
+    ui->checkBox->setChecked(true);
+    ui->checkBox_2->setChecked(false);
 
-  ui->checkBox_3->setChecked(false);
+    ui->checkBox_3->setChecked(false);
 
-  ui->lineEdit_3->setText("0");
+    ui->lineEdit_3->setText("0.9"); // cell z to xy ratio
+    ui->lineEdit_4->setText("0.3"); // nucleus z to xy ratio
 
-  ui->lineEdit_4->setText("0");
+    ui->comboBox->addItem("Uniform");
+    ui->comboBox->addItem("Random");
+    ui->comboBox->addItem("3D in-vivo");
 
-  ui->comboBox->addItem("Uniform");
-  ui->comboBox->addItem("Random");
-  ui->comboBox->addItem("Manual");
+    ui->comboBox_2->addItem("proton");
+    ui->comboBox_2->addItem("neutron");
+    ui->comboBox_2->addItem("photon");
+    ui->comboBox_2->addItem("alpha");
 
-  ui->comboBox_2->addItem("proton");
-  ui->comboBox_2->addItem("neutron");
-  ui->comboBox_2->addItem("photon");
-  ui->comboBox_2->addItem("alpha");
+    ui->lineEdit_7->setText("10");
 
-  ui->lineEdit_7->setText("10");
+    ui->comboBox_3->addItem("Disk");
+    ui->comboBox_3->addItem("Point");
 
-  ui->comboBox_3->addItem("Disk");
-  ui->comboBox_3->addItem("Point");
+    ui->lineEdit_8->setText("0.1");
 
-  ui->lineEdit_8->setText("0.1");
+    ui->lineEdit_9->setText("1");
 
-  ui->lineEdit_9->setText("1");
+    ui->comboBox_4->addItem("TISSUE-SOFT(ICRU-44)");
+    ui->comboBox_4->addItem("WATER");
+    ui->comboBox_4->addItem("BONE-CORTICAL(ICRU-44)");
+    ui->comboBox_4->addItem("ADIPOSE-TISSUE");
+    ui->comboBox_4->addItem("A-150-PLASTIC");
+    ui->comboBox_4->addItem("B-100-PLASTIC");
+    ui->comboBox_4->addItem("MUSCLE-SKELETAL");
 
-  ui->comboBox_4->addItem("TISSUE-SOFT(ICRU-44)");
-  ui->comboBox_4->addItem("WATER");
-  ui->comboBox_4->addItem("BONE-CORTICAL(ICRU-44)");
-  ui->comboBox_4->addItem("ADIPOSE-TISSUE");
-  ui->comboBox_4->addItem("A-150-PLASTIC");
-  ui->comboBox_4->addItem("B-100-PLASTIC");
-  ui->comboBox_4->addItem("MUSCLE-SKELETAL");
+    ui->comboBox_5->addItem("TISSUE-SOFT(ICRU-44)");
+    ui->comboBox_5->addItem("WATER");
+    ui->comboBox_5->addItem("BONE-CORTICAL(ICRU-44)");
+    ui->comboBox_5->addItem("ADIPOSE-TISSUE");
+    ui->comboBox_5->addItem("A-150-PLASTIC");
+    ui->comboBox_5->addItem("B-100-PLASTIC");
+    ui->comboBox_5->addItem("MUSCLE-SKELETAL");
 
-  ui->comboBox_5->addItem("TISSUE-SOFT(ICRU-44)");
-  ui->comboBox_5->addItem("WATER");
-  ui->comboBox_5->addItem("BONE-CORTICAL(ICRU-44)");
-  ui->comboBox_5->addItem("ADIPOSE-TISSUE");
-  ui->comboBox_5->addItem("A-150-PLASTIC");
-  ui->comboBox_5->addItem("B-100-PLASTIC");
-  ui->comboBox_5->addItem("MUSCLE-SKELETAL");
+    ui->comboBox_6->addItem("TISSUE-SOFT(ICRU-44)");
+    ui->comboBox_6->addItem("WATER");
+    ui->comboBox_6->addItem("BONE-CORTICAL(ICRU-44)");
+    ui->comboBox_6->addItem("ADIPOSE-TISSUE");
+    ui->comboBox_6->addItem("A-150-PLASTIC");
+    ui->comboBox_6->addItem("B-100-PLASTIC");
+    ui->comboBox_6->addItem("MUSCLE-SKELETAL");
 
-  ui->comboBox_6->addItem("TISSUE-SOFT(ICRU-44)");
-  ui->comboBox_6->addItem("WATER");
-  ui->comboBox_6->addItem("BONE-CORTICAL(ICRU-44)");
-  ui->comboBox_6->addItem("ADIPOSE-TISSUE");
-  ui->comboBox_6->addItem("A-150-PLASTIC");
-  ui->comboBox_6->addItem("B-100-PLASTIC");
-  ui->comboBox_6->addItem("MUSCLE-SKELETAL");
+    ui->comboBox_6->setCurrentIndex(1);
 
-  ui->comboBox_6->setCurrentIndex(1);
+    ui->comboBox_7->addItem("AIR-DRY-NIST");
 
-  ui->comboBox_7->addItem("AIR-DRY-NIST");
-
-  ui->lineEdit_12->setText("100000");
-  ui->lineEdit_13->setText("10");
+    ui->lineEdit_12->setText("100000");
+    ui->lineEdit_13->setText("10");
 
     ui->checkBox_4->setChecked(true);
 }
@@ -121,7 +120,7 @@ bool cellmaker::eventFilter(QObject *obj, QEvent *event) {
         // determine zoom direction
         double scaleFactor = 1.15; // 15% zoom per scroll click
         if (wheelEvent->angleDelta().y() < 0) {
-            scaleFactor = 1.0 / scaleFactor; // Zoom out
+            scaleFactor = 1.0 / scaleFactor; // zoom out
         }
 
         ui->graphicsView->scale(scaleFactor, scaleFactor);
@@ -137,8 +136,10 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
                                const QString z0, const QString e0,
                                QList<CompleteCell> cells, double bufH,
                                double majorZ, int cytoMatNo, int nucMatNo,
-                               int buffMatNo) {
-    const double micro_factor = 1E-4; // factor to scale down to micron
+                               int buffMatNo, bool is3DMode) {
+
+
+    const double micro_factor = 1; //1E-4; // factor to scale down to micron
 
     for (int i = 0; i < cells.size(); ++i) {
 
@@ -159,23 +160,33 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
 
     // pre-calculate dimensions for parameters
     bufH *= micro_factor;
-    majorZ *= micro_factor;
 
-    // below fixing issue for randomized cells, the last() function cannot work
-    // for randomized find the furthest point any cell reaches (center+rad)
+    // scaled used here
     double maxExtent = 0.0;
+    double minZ = 0.0;
+
     for (const auto &cell : cells) {
+
         double reachX = std::abs(cell.x) + cell.rx;
+
         double reachY = std::abs(cell.y) + cell.rx; // assuming rx is used for Y plane
+
         maxExtent = std::max({maxExtent, reachX, reachY});
+
+        minZ = std::min(minZ, cell.z - cell.rz);
+
     }
+
     double halfGrid = maxExtent + (20.0 * micro_factor);
+
+    double bufferBottom = minZ - (20.0 * micro_factor);
 
     QFile f(path);
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         qWarning() << "Failed to open" << path << ":" << f.errorString();
         return;
     }
+
     QTextStream out(&f);
     out.setRealNumberNotation(QTextStream::FixedNotation);
     out.setRealNumberPrecision(6);
@@ -193,16 +204,34 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
     // parameter geomtry constants in form of c*
     out << "$--- Cell Geometry Parameters (cm) ---" << Qt::endl;
     // c10: cell radius, c11: cell height
-    out << QString("set: c10[%1] $ Cell Radius").arg(cells[0].rx, 8, 'f', 6) << Qt::endl;
-    out << QString("set: c11[%1] $ Cell Height (Major Z)").arg(majorZ, 8, 'f', 6) << Qt::endl;
+    // c10: cell radius, c11: cell height (Now ratio-scaled)
+    out << QString("set: c10[%1] $ Cell XY Radius").arg(cells[0].rx, 8, 'f', 6) << Qt::endl;
+    out << QString("set: c11[%1] $ Cell Z Height").arg(cells[0].rz, 8, 'f', 6) << Qt::endl;
 
-    // c20: nucleus radius, c21: nucleus height
-    out << QString("set: c20[%1] $ Nucleus Radius").arg(cells[0].nrx, 8, 'f', 6) << Qt::endl;
-    out << QString("set: c21[%1] $ Nucleus Height").arg(cells[0].nrz, 8, 'f', 6) << Qt::endl;
+    // c20: nucleus radius, c21: nucleus height (Now ratio-scaled)
+    out << QString("set: c20[%1] $ Nucleus XY Radius").arg(cells[0].nrx, 8, 'f', 6) << Qt::endl;
+    out << QString("set: c21[%1] $ Nucleus Z Height").arg(cells[0].nrz, 8, 'f', 6) << Qt::endl;
 
     // c30: buffer medium height, c31: buffer half-width
+    /*
     out << QString("set: c30[%1] $ Total Buffer Height").arg(majorZ + bufH, 8, 'f', 6) << Qt::endl;
     out << QString("set: c31[%1] $ Buffer Half-Width").arg(halfGrid, 8, 'f', 6) << Qt::endl;
+    out << "\n";
+*/
+
+    if (is3DMode) {
+
+        out << QString("set: c30[%1] $ Buffer Bottom Boundary").arg(bufferBottom, 8, 'f', 6) << Qt::endl;
+
+    } else {
+
+        double topBufferBoundary = cells[0].rz + bufH;
+        out << QString("set: c30[%1] $ Total Buffer Height").arg(topBufferBoundary, 8, 'f', 6) << Qt::endl;
+
+    }
+
+    out << QString("set: c31[%1] $ Buffer Half-Width").arg(halfGrid, 8, 'f', 6) << Qt::endl;
+
     out << "\n";
 
     // source card here, it is dynamic for disk and point
@@ -210,6 +239,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
 
     if (sourceType.trimmed().compare(QLatin1String("Point"),
                                      Qt::CaseInsensitive) == 0) {
+
         // point source (s-type = 9)
         out << "s-type = 9" << Qt::endl;
         out << "proj = " << proj << Qt::endl;
@@ -220,6 +250,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
         out << "y0 = 0.00" << Qt::endl;
         out << "z0 = " << z0 << Qt::endl;
     } else {
+
         //s-type = 1
         out << "s-type = 1" << Qt::endl;
         out << "proj = " << proj << Qt::endl;
@@ -229,7 +260,9 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
         out << "y0 = 0.00" << Qt::endl;
         out << "z0 = " << z0 << Qt::endl;
         out << "z1 = " << z0 << Qt::endl;
+
     }
+
     out << "e0 = " << e0 << "\n\n";
 
     out << "[ M a t e r i a l ]" << Qt::endl;
@@ -320,13 +353,12 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
     for (int i = 0; i < totalCells; ++i) {
         const auto &cell = cells[i];
 
-        out << QString("%1  ELL  %2 %3 %4  %5 %6 c11  -c10")
+        // ellipsoid of revolution (0 0 c11)
+        out << QString("%1  ELL  %2 %3 %4  0 0 c11  -c10")
                    .arg(cell.cellSurfId, -3)
                    .arg(cell.x, 8, 'f', 6)
                    .arg(cell.y, 8, 'f', 6)
                    .arg(cell.z, 8, 'f', 6)
-                   .arg(cell.majorX, 8, 'f', 6)
-                   .arg(cell.majorY, 8, 'f', 6)
             << " $cytoplasm" << Qt::endl;
     }
 
@@ -334,10 +366,28 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
     int nextId = (totalCells * 2) + 1;
 
     int containerId = nextId++;
+
+    /*
     // c31 for the lateral bounds and c30 for the top
     out << QString("%1  RPP  -c31 c31 -c31 c31 -1.0e-5 c30")
                .arg(containerId)
         << " $buffer" << Qt::endl;
+*/
+    if (is3DMode) {
+
+        // buffer goes from Z=0 down to the bottom boundary
+        out << QString("%1  RPP  -c31 c31 -c31 c31 c30 0.0")
+                   .arg(containerId)
+            << " $tissue buffer" << Qt::endl;
+
+    } else {
+
+        // dome cells resting at Z=0, buffer goes up
+        out << QString("%1  RPP  -c31 c31 -c31 c31 -1.0e-5 c30")
+                   .arg(containerId)
+            << " $in-vitro medium buffer" << Qt::endl;
+    }
+
 
     // the planes
     int pz_bottom = nextId++; // equivalent to 11 in old code
@@ -359,17 +409,23 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
 
     out << "\n[ C e l l ]" << Qt::endl;
 
-    // instead of a string of negative # operators, string of
-    // positive surface IDs representing the outsides of the cytoplasms
+
     QString positiveCytoSurfaces = "";
+
     QString domainsREG = "";
+
     int cellCounter = 0;
 
     double Cytodensity = 0.0;
+
     double Nucdensity = 0.0;
+
     double Bufdensity = 0.0;
+
     double Airdensity = -0.00129;
+
     static const double densities[] = {1.06, 1.00, 1.92, 0.95, 1.127, 1.45, 1.05};
+
     const int num_materials = sizeof(densities) / sizeof(densities[0]);
 
     // qDebug() << num_materials << Qt::endl;
@@ -396,6 +452,32 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
                    .arg(cell.nucSurfId)
             << " $nucleus" << Qt::endl;
 
+
+        if (is3DMode) {
+
+            // full ellipsoid when 3D mode, no cutting plane (-pz_top is removed)
+            out << QString("%1  %2 -%3 -%4 #%5")
+                       .arg(cell.cellSurfId, -3)
+                       .arg(cytoMatNo + 1)
+                       .arg(Cytodensity)
+                       .arg(cell.cellSurfId)
+                       .arg(cell.nucSurfId)
+                << " $full cytoplasm" << Qt::endl;
+
+        } else {
+
+            // 2D dome cut by pz_top
+            out << QString("%1  %2 -%3 (-%4 %5) #%6")
+                       .arg(cell.cellSurfId, -3)
+                       .arg(cytoMatNo + 1)
+                       .arg(Cytodensity)
+                       .arg(cell.cellSurfId)
+                       .arg(pz_top)
+                       .arg(cell.nucSurfId)
+                << " $cytoplasm dome" << Qt::endl;
+        }
+
+        /*
         out << QString("%1  %2 -%3 (-%4 %5) #%6")
                    .arg(cell.cellSurfId, -3)
                    .arg(cytoMatNo + 1)
@@ -404,26 +486,49 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
                    .arg(pz_top)
                    .arg(cell.nucSurfId)
             << " $cytoplasm" << Qt::endl;
+        */
 
-        // line break with 5 space to tackle phits limit
+
+        // line break in phits script
         if (cellCounter > 0 && cellCounter % 8 == 0) {
             positiveCytoSurfaces += "\n     ";
             domainsREG += "\n     ";
         }
 
-        //appending the positive cellSurfId (outside cytoplasm)
+        // appending the positive cellSurfId (outside cytoplasm)
         positiveCytoSurfaces += QString(" %1").arg(cell.cellSurfId);
         domainsREG += QString(" %1 %2").arg(cell.cellSurfId).arg(cell.nucSurfId);
         cellCounter++;
     }
 
     // optimized buffer cell (3000)
+    if (is3DMode) {
+
+        out << QString("3000  %1 -%2  -%3")
+                   .arg(buffMatNo + 1)
+                   .arg(Bufdensity)
+                   .arg(containerId)
+            << positiveCytoSurfaces << " $optimized buffer" << Qt::endl;
+
+    } else {
+
+        out << QString("3000  %1 -%2  (-%3 %4)")
+                   .arg(buffMatNo + 1)
+                   .arg(Bufdensity)
+                   .arg(containerId)
+                   .arg(pz_top)
+            << positiveCytoSurfaces << " $optimized buffer" << Qt::endl;
+
+    }
+
+    /*
     out << QString("3000  %1 -%2  (-%3 %4)")
                .arg(buffMatNo + 1)
                .arg(Bufdensity)
                .arg(containerId)
                .arg(pz_top)
         << positiveCytoSurfaces << " $optimized buffer" << Qt::endl;
+    */
 
     // le buffer
     out << QString("3001  %1 -%2 %3 -%4 -%5 %6 -%7 %8")
@@ -439,12 +544,34 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
 
     // optimized outer world cell (4001)
     // complement operator (:) to define everything outside the RPP container
+
+    /*
     out << QString("4001 %1 %2 -4000  ( %3 : -%4 ) #3001")
                .arg(num_materials + 1)
                .arg(Airdensity)
                .arg(containerId)
                .arg(pz_top)
         << " $optimized outer boundary" << Qt::endl;
+*/
+
+
+    if (is3DMode) {
+        out << QString("4001 %1 %2 -4000  %3")
+                   .arg(num_materials + 1)
+                   .arg(Airdensity)
+                   .arg(containerId)
+            << " $optimized outer boundary" << Qt::endl;
+
+    } else {
+
+        out << QString("4001 %1 %2 -4000  ( %3 : -%4 ) #3001")
+                   .arg(num_materials + 1)
+                   .arg(Airdensity)
+                   .arg(containerId)
+                   .arg(pz_top)
+            << " $optimized outer boundary" << Qt::endl;
+
+    }
 
     // the void
     out << "4000  -1  4000" << Qt::endl;
@@ -464,7 +591,12 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
         out << "ny = 200" << Qt::endl;
         out << " z-type = 1" << Qt::endl;
         out << "nz = 1" << Qt::endl;
-        out << "0.000 c30/40.0" << Qt::endl;
+
+        if (is3DMode) {
+            out << "c30 0.000" << Qt::endl;
+        } else {
+            out << "0.000 c30/40.0" << Qt::endl;
+        }
         out << "axis = xy" << Qt::endl;
         out << "file = geometry_topview.out" << Qt::endl;
         out << "output = 6" << Qt::endl;
@@ -485,7 +617,12 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
         out << "ny = 200" << Qt::endl;
         out << " z-type = 1" << Qt::endl;
         out << "nz = 1" << Qt::endl;
-        out << "0.000 c30" << Qt::endl;
+
+        if (is3DMode) {
+            out << "c30 0.000" << Qt::endl;
+        } else {
+            out << "0.000 c30" << Qt::endl;
+        }
         out << "axis = xy" << Qt::endl;
         out << "file = tracks.out" << Qt::endl;
         out << "e-type = 3" << Qt::endl;
@@ -512,7 +649,12 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
         out << "ny = 200" << Qt::endl;
         out << " z-type = 1" << Qt::endl;
         out << "nz = 1" << Qt::endl;
-        out << "0.000 c30" << Qt::endl;
+
+        if (is3DMode) {
+            out << "c30 0.000" << Qt::endl;
+        } else {
+            out << "0.000 c30" << Qt::endl;
+        }
         out << "axis = xy" << Qt::endl;
         out << "file = top_view_deposit.out" << Qt::endl;
         out << "part = all" << Qt::endl;
@@ -523,7 +665,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
 
         out << Qt::scientific;
         out.setRealNumberPrecision(
-            3); // good enough for cells in micron range since will be written as cm
+            3); // precision
 
         out << "\n[ T - Deposit ]" << Qt::endl;
         out << "title = dose in cell constituents" << Qt::endl;
@@ -533,10 +675,25 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
         out << "reg      vol" << Qt::endl;
 
         for (const auto &cell : cells) {
+            // nucleus is ALWAYS 3D ellipsoid
             double nucVol = M_PI * (4.0 / 3.0) * (cell.nrx * cell.nrx * cell.nrz);
-            double cellVol =
-                M_PI * (2.0 / 3.0) * (cell.rx * cell.rx * cell.rz) -
-                nucVol; // to be precise remove out volume of nucleus from cytoplasm
+
+            // cell volume depends on if it is a 3D full ellipsoid or a 2D dome
+            double cellTotalVol = 0.0;
+            if (is3DMode) {
+
+                // full ellipsoid
+                cellTotalVol = M_PI * (4.0 / 3.0) * (cell.rx * cell.rx * cell.rz);
+
+            } else {
+
+                // half ellipsoid cut at Z=0 plane
+                cellTotalVol = M_PI * (2.0 / 3.0) * (cell.rx * cell.rx * cell.rz);
+
+            }
+
+            // to be precise, we remove the volume of the nucleus from the cytoplasm
+            double cellVol = cellTotalVol - nucVol;
 
             out << cell.cellSurfId << "   " << cellVol << Qt::endl;
             out << cell.nucSurfId << "   " << nucVol << Qt::endl;
@@ -555,27 +712,41 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
 }
 
 
+
 void cellmaker::on_pushButton_clicked() {
     ui->textBrowser->setText("");
     QRandomGenerator *generator = QRandomGenerator::global();
 
-    // Read UI inputs
+
     int cellNo = ui->lineEdit_6->text().toInt();
     double cellSize = ui->lineEdit->text().toDouble();
     double nucleusSize = ui->lineEdit_10->text().toDouble();
     double CellPitch = ui->lineEdit_11->text().toDouble();
 
-    const double majorZ = ui->lineEdit_5->text().toDouble();
-    const double majorX = ui->lineEdit_3->text().toDouble();
-    const double majorY = ui->lineEdit_4->text().toDouble();
-    const double bufH = ui->lineEdit_2->text().toDouble();
+    // read ratios
+    double cellZRatio = ui->lineEdit_3->text().toDouble();
+    if (cellZRatio <= 0.0) cellZRatio = 0.5; // Safety fallback
+
+    double nucZRatio = ui->lineEdit_4->text().toDouble();
+    if (nucZRatio <= 0.0) nucZRatio = 0.8; // Safety fallback
+
+    // calc. actual Z radii based on XY radii and user ratios
+    double actualCellRz = (cellSize / 2.0) * cellZRatio;
+    double actualNucRz = (nucleusSize / 2.0) * nucZRatio;
 
     double spacing = cellSize + CellPitch;
     double totalSpan = (cellNo - 1) * spacing;
     double halfSpan = totalSpan / 2.0;
 
     QString cytoplasmType = ui->comboBox->currentText();
-    double userRadius = ui->spinBoxRandomRadius->value();
+
+
+    double userRadius = 0.0;
+    if (cytoplasmType == "Random" || cytoplasmType == "3D in-vivo") {
+        //userRadius = cellSize / 2.0;
+        userRadius = ui->spinBoxRandomRadius->value();
+    }
+
     const int maxAttempts = 1000;
 
     QVector<QPointF> placedCenters;
@@ -583,22 +754,30 @@ void cellmaker::on_pushButton_clicked() {
     currentCellList.clear();
 
 
-    //maual cell array deifition
-    if (cytoplasmType == "Manual") {
+    // 3D in-vivo cell array definition
+    if (cytoplasmType == "3D in-vivo") {
         ManualArrangeDialog dlg(this);
-        dlg.setDefaultParams(ui->lineEdit->text().toDouble(),
-                             ui->lineEdit_10->text().toDouble(),
-                             ui->lineEdit_5->text().toDouble());
+
+        dlg.setDefaultParams(cellSize, nucleusSize, cellNo, CellPitch, userRadius, cellZRatio, nucZRatio);
 
         if (dlg.exec() == QDialog::Accepted) {
             currentCellList = dlg.getFinalCells();
-            renderManualCells(); // Drawing happens here
+
+            if (currentCellList.isEmpty()) {
+                ui->textBrowser->setText(tr("<font color='red'>Error: Generation aborted.</font>"));
+                return;
+            }
+
+            is3DMode = true;
+            renderManualCells();
         }
         return;
     }
 
+    is3DMode = false;
 
-    //cell array data generation
+
+    // 2D cell array data generation
     for (int i = 0; i < cellNo && placementOk; ++i) {
         for (int j = 0; j < cellNo && placementOk; ++j) {
             double baseCx = (i * spacing) - halfSpan;
@@ -645,17 +824,24 @@ void cellmaker::on_pushButton_clicked() {
 
             CompleteCell cc;
             cc.x = cx; cc.y = cy; cc.z = cz;
-            cc.rx = cellSize / 2.0;
-            cc.rz = majorZ;
-            cc.majorX = majorX; cc.majorY = majorY;
-            cc.nrx = nucleusSize / 2.0;
-            cc.nrz = nucleusSize / 4.0;
 
+            // calculated radii
+            cc.rx = cellSize / 2.0;
+            cc.rz = actualCellRz;
+
+            cc.nrx = nucleusSize / 2.0;
+            cc.nrz = actualNucRz;
+
+            // set major axis X and Y to zero
+            cc.majorX = 0.0;
+            cc.majorY = 0.0;
+
+            // valid Z space for 2D dome nucleus
             double minNz = cc.nrz + 0.000001;
             double maxNz = cc.rz * std::sqrt(1.0 - std::pow(cc.nrx / cc.rx, 2)) - cc.nrz - 0.000001;
 
             if (maxNz < minNz || cc.nrx >= cc.rx) {
-                ui->textBrowser->setText(tr("<font color='red'>Error: Nucleus is too large.</font>"));
+                ui->textBrowser->setText(tr("<font color='red'>Error: Nucleus is too large or ratio causes protrusion.</font>"));
                 placementOk = false;
                 continue;
             }
@@ -681,10 +867,9 @@ void cellmaker::on_pushButton_clicked() {
 
     renderManualCells();
 
-
     ui->textBrowser->append("\n<font color='green'>2D Models generated successfully! Scroll to zoom.</font>");
-
 }
+
 
 //view toggles
 void cellmaker::on_pushButton_5_clicked() {
@@ -710,12 +895,12 @@ void cellmaker::on_pushButton_6_clicked() {
 void cellmaker::on_pushButton_4_clicked() { QApplication::quit(); }
 
 void cellmaker::on_pushButton_3_clicked() {
-  QMessageBox::about(
-      this, tr("CellMaker Program"),
-      tr("Generate Cell Arrays for Monte Carlo Radiation Transport Studies.\n"
-         "Developed by: Mehrdad S. Beni and Hiroshi Watabe, RARiS, Tohoku "
-         "University, JAPAN -- 2026\n"
-         "Version 1.0.0"));
+    QMessageBox::about(
+        this, tr("CellMaker Program"),
+        tr("Generate Cell Arrays for Monte Carlo Radiation Transport Studies.\n"
+           "Developed by: Mehrdad S. Beni and Hiroshi Watabe, RARiS, Tohoku "
+           "University, JAPAN -- 2026\n"
+           "Version 1.0.0"));
 }
 
 void cellmaker::on_actionQuit_triggered() { on_pushButton_4_clicked(); }
@@ -723,7 +908,7 @@ void cellmaker::on_actionQuit_triggered() { on_pushButton_4_clicked(); }
 void cellmaker::on_actionAbout_triggered() { on_pushButton_3_clicked(); }
 
 void cellmaker::on_actionGenerate_Cell_Array_triggered() {
-  on_pushButton_clicked();
+    on_pushButton_clicked();
 }
 
 void cellmaker::on_actionZoom_triggered() { on_pushButton_5_clicked(); }
@@ -781,8 +966,9 @@ void cellmaker::on_pushButton_7_clicked() {
 
     QString bufHString = ui->lineEdit_2->text();
     double bufH = bufHString.toDouble();
-    QString majorZString = ui->lineEdit_5->text();
-    double majorZ = majorZString.toDouble();
+
+
+    double majorZ = 0.0;
 
     int cytoMatNo = ui->comboBox_4->currentIndex();
     int nucMatNo = ui->comboBox_5->currentIndex();
@@ -803,7 +989,7 @@ void cellmaker::on_pushButton_7_clicked() {
 
     phitsScriptGen(saveFilePath, maxcas, maxbch, sourceType, proj, r0,
                    z0, e0, currentCellList, bufH, majorZ, cytoMatNo, nucMatNo,
-                   buffMatNo);
+                   buffMatNo, is3DMode);
 
     ui->textBrowser->append("\n<font color='blue'>File saved to: " + saveFilePath + "</font>");
 }
@@ -847,29 +1033,25 @@ void cellmaker::on_pushButton_8_clicked() {
     // --- ENGLISH MANUAL ---
     ManualText english = {
         "<h2 style='color: #0078D7;'>PHITS CellMaker Overview</h2>"
-        "<p>This utility automates the creation of complex 3D semi-ellipsoid cell geometries for PHITS Monte Carlo simulations. "
+        "<p>This utility automates the creation of complex 2D semi-ellipsoid and 3D full-ellipsoid cell geometries for PHITS Monte Carlo simulations. "
         "The tool ensures all components are mathematically contained within their respective boundaries, preventing geometry overlaps and errors.</p>"
 
         "<h3>1. Physical Geometry and Shape</h3>"
         "<ul>"
-        "<li><b>Cell Shape:</b> Each cell is modeled as a <b>semi-ellipsoid (dome)</b> resting on the Z=0 plane. "
-        "The <b>'Major Z'</b> parameter defines the <b>peak vertical height</b> of the cell dome.</li>"
-        "<li><b>Nucleus Shape & Placement:</b> The nucleus is modeled as a 3D <b>ellipsoid</b>. By default, it is slightly flattened (oblate) "
-        "to mimic biological reality. The software randomly positions it within the cytoplasm, ensuring it never "
-        "protrudes through the cell membrane (dome surface).</li>"
-        "<li><b>Medium / Buffer (Extracellular Region):</b> The 'Buffer' represents the <b>Culture Medium</b> (for in-vitro studies) "
-        "or the <b>Interstitium / Extracellular Fluid</b> (for in-vivo modeling). It defines the liquid volume that "
-        "submerges the cell array, extending from the floor up to the specified buffer height.</li>"
+        "<li><b>Cell Shape:</b> Depending on the selected mode, cells are modeled as either <b>2D semi-ellipsoids (domes)</b> resting on the Z=0 plane, or <b>3D full ellipsoids</b> submerged in tissue. "
+        "The shape is controlled by a <b>'Z-to-XY Ratio'</b> (e.g., a ratio of 0.5 creates a realistic flattened cell based on the defined radius).</li>"
+        "<li><b>Nucleus Shape & Placement:</b> The nucleus is modeled as a 3D <b>ellipsoid</b> using its own specific Z-to-XY Ratio. "
+        "The software randomly positions it within the cytoplasm in full 3D space, mathematically ensuring it never protrudes through the cell membrane.</li>"
+        "<li><b>Medium / Tissue Buffer:</b> For 2D <i>in-vitro</i> studies, the buffer extends upward from the floor. For 3D <i>in-vivo</i> modeling, "
+        "it extends downwards from the tissue surface (Z=0) to completely submerge the cell array at your specified depth.</li>"
         "</ul>"
 
         "<h3>2. Array Distribution and Spacing</h3>"
         "<ul>"
-        "<li><b>Cell Array Size:</b> Generates an N x N grid of cells.</li>"
-        "<li><b>Cell Pitch:</b> Defines the clear distance between the outer boundaries of adjacent cells.</li>"
-        "<li><b>Uniform vs. Random:</b> 'Uniform' creates a perfect lattice. 'Random' allows cells to shift within a defined radius "
-        "to simulate realistic, non-idealized biological distributions.</li>"
-        "<li><b>Manual Arrangement:</b> Bypasses the grid, allowing you to input exact (X, Y, Z) coordinates for individual cells via a custom data table.<br>"
-        "<b>Important Note:</b> Shifting cells along the Z-axis disrupts the cutting plane, meaning the cell will no longer be a perfect semi-ellipsoid. We strongly recommend keeping the Z coordinate of all cells at zero.</li>"
+        "<li><b>2D Array:</b> Generates a flat N x N grid of dome cells.</li>"
+        "<li><b>3D In-Vivo Array:</b> Generates an N x N x Z multi-layer grid of full ellipsoids. You can specify the exact <b>Depth In-Vivo</b> to submerge the highest cells below the surface.</li>"
+        "<li><b>Uniform vs. Random:</b> 'Uniform' creates a perfect mathematical lattice. 'Random' safely shifts cells in 2D or 3D space within a defined 'Random Radius' "
+        "to simulate realistic, non-idealized biological distributions. The algorithm rigorously checks to ensure random shifts never cause cell overlaps or breach the defined tissue depth.</li>"
         "</ul>"
 
         "<h3>3. Simulation Parameters & Scoring</h3>"
@@ -882,15 +1064,14 @@ void cellmaker::on_pushButton_8_clicked() {
         "<h3>4. Workflow: Preview to Execution</h3>"
         "<ol>"
         "<li><b>Generate:</b> Process the mathematical model and visualize it in the 2D viewer.</li>"
-        "<li><b>Verify:</b> Use the <b>XY (Top View)</b> to check lateral spacing and the <b>XZ (Side View)</b> for vertical profiles and nucleus depth.</li>"
-        "<li><b>Export:</b> Generate the <code>.inp</code> file with automatic <code>[ Surface ]</code> and <code>[ Cell ]</code> cards.<br>"
-        "<i>Note: The exported file is fully parameterized using <code>c*</code> variables, allowing you to easily tweak cell radii and heights directly in the text file later!</i></li>"
+        "<li><b>Verify:</b> Use the <b>XY (Top View)</b> to check lateral spacing and the <b>XZ (Side View)</b> for vertical profiles and buffer depths.</li>"
+        "<li><b>Export:</b> Generate the <code>.inp</code> file with automatic <code>[ Surface ]</code> and <code>[ Cell ]</code> cards.</li>"
         "<li><b>Execute:</b> Run the local PHITS executable directly from the utility to begin the transport calculation.</li>"
         "</ol>"
 
         "<h3>Important Technical Notes</h3>"
         "<ul>"
-        "<li><b>Geometry Validation:</b> If the 'Nucleus Size' exceeds the 'Major Z' or 'Cell Size', generation will fail to prevent geometric overlaps.</li>"
+        "<li><b>Geometry Validation:</b> If the user-defined sizes or ratios result in a nucleus that is too large to fit safely inside the cell, or if random placement fails to resolve overlaps within 1000 attempts, generation will abort to protect the simulation physics.</li>"
         "<li><b>Units:</b> All inputs are in <b>micrometers (µm)</b>, but are automatically converted and exported to PHITS in <b>centimeters (cm)</b>.</li>"
         "</ul>"
     };
@@ -898,27 +1079,24 @@ void cellmaker::on_pushButton_8_clicked() {
     // --- JAPANESE MANUAL ---
     ManualText japanese = {
         "<h2 style='color: #0078D7;'>PHITS CellMaker 概要</h2>"
-        "<p>このユーティリティは、PHITSモンテカルロシミュレーション用の複雑な3D半楕円体細胞形状の作成を自動化します。"
+        "<p>このユーティリティは、PHITSモンテカルロシミュレーション用の複雑な2D半楕円体および3D完全楕円体細胞形状の作成を自動化します。"
         "すべての構成要素がそれぞれの境界内に数学的に収まるように設計されており、ジオメトリの重複やエラーを防止します。</p>"
 
         "<h3>1. 物理的なジオメトリと形状</h3>"
         "<ul>"
-        "<li><b>細胞の形状:</b> 各細胞は、Z=0平面上に配置された<b>半楕円体（ドーム型）</b>としてモデル化されます。"
-        "<b>「Major Z」</b>パラメータは、この細胞ドームの<b>垂直方向の最大の高さ</b>を定義します。</li>"
-        "<li><b>核の形状と配置:</b> 核は3次元の<b>楕円体</b>としてモデル化されます。デフォルトでは、実際の生物学的細胞に"
-        "近い、やや平らな形状（扁平）をしています。ソフトウェアは、核が細胞膜（ドーム表面）を突き抜けないよう、細胞質内の安全な範囲にランダムに配置します。</li>"
-        "<li><b>培養液・細胞外領域 (Medium / Buffer):</b> 「バッファー」は、試験管内（in-vitro）実験における<b>培養液（Medium）</b>、"
-        "または生体内（in-vivo）モデルにおける<b>間質液や細胞外領域</b>を表します。"
-        "これは、床面から指定された高さまで細胞配列全体を覆う液体の体積を定義します。</li>"
+        "<li><b>細胞の形状:</b> 選択したモードに応じて、Z=0平面上に配置された<b>2D 半楕円体（ドーム型）</b>、または組織内に沈められた<b>3D 完全楕円体</b>としてモデル化されます。"
+        "形状は<b>「Z軸/XY軸の比率 (Z-to-XY Ratio)」</b>によって制御されます（例：0.5を指定するとリアルな扁平細胞になります）。</li>"
+        "<li><b>核の形状と配置:</b> 核は独自の比率を持つ3次元の<b>楕円体</b>として細胞内に配置されます。"
+        "ソフトウェアは、核が細胞膜を突き抜けないよう、3D空間上の安全な範囲にランダムに配置します。</li>"
+        "<li><b>培養液・組織領域 (Buffer):</b> 2D (in-vitro) 設定では床面から上方に伸びます。3D (in-vivo) モデルでは、"
+        "組織表面 (Z=0) から下方へ伸び、指定された深さの細胞配列全体を完全に包み込みます。</li>"
         "</ul>"
 
         "<h3>2. 配列の分布と間隔</h3>"
         "<ul>"
-        "<li><b>細胞配列サイズ:</b> N x N の細胞グリッドを作成します。</li>"
-        "<li><b>セルピッチ:</b> 隣接する細胞の外境界間の距離（クリアランス）を指定します。</li>"
-        "<li><b>均一 vs ランダム:</b> 「Uniform（均一）」は完全な格子状を作成します。「Random（ランダム）」は定義された半径内で細胞をシフトさせ、理想化されていない実際の生体サンプルの分布をシミュレートします。</li>"
-        "<li><b>手動配置 (Manual Arrangement):</b> グリッドをバイパスし、専用のデータテーブルを介して個々の細胞の正確な (X, Y, Z) 座標を直接入力できます。<br>"
-        "<b>重要な注意点:</b> Z軸方向へ細胞をシフトさせると切断面が維持されなくなり、細胞が完全な半楕円体ではなくなります。すべての細胞のZ座標はゼロ（ベースゼロ）に保つことを強く推奨します。</li>"
+        "<li><b>2D 配列:</b> N x N のドーム型細胞グリッドを作成します。</li>"
+        "<li><b>3D In-Vivo 配列:</b> N x N x Z の多層グリッド（完全楕円体）を作成します。<b>「Depth In-Vivo (深さ)」</b>を指定し、細胞を表面より下に沈めることができます。</li>"
+        "<li><b>均一 vs ランダム:</b> 「Uniform（均一）」は完全な格子を作成します。「Random（ランダム）」は定義された半径内で2Dまたは3D空間上で細胞をシフトさせ、実際の生体サンプルのような分布をシミュレートします。ランダム配置の際は、細胞同士の重複や指定された深さのはみ出しがないよう厳密にアルゴリズムでチェックされます。</li>"
         "</ul>"
 
         "<h3>3. シミュレーションパラメータとスコアリング</h3>"
@@ -931,15 +1109,14 @@ void cellmaker::on_pushButton_8_clicked() {
         "<h3>4. ワークフロー: プレビューから実行まで</h3>"
         "<ol>"
         "<li><b>生成 (Generate):</b> 数学モデルを処理し、2Dビューアで視覚化します。</li>"
-        "<li><b>検証 (Verify):</b> <b>XY (平面図)</b> で横方向の間隔を、<b>XZ (側面図)</b> で垂直プロファイルと核の深さを確認します。</li>"
-        "<li><b>保存 (Export):</b> 自動化された <code>[ Surface ]</code> および <code>[ Cell ]</code> カードを含む <code>.inp</code> ファイルを生成します。<br>"
-        "<i>注：エクスポートされたファイルは <code>c*</code> 変数を使用して完全にパラメータ化されているため、後からテキストファイル上で細胞の半径や高さを簡単に微調整できます！</i></li>"
+        "<li><b>検証 (Verify):</b> <b>XY (平面図)</b> で横方向の間隔を、<b>XZ (側面図)</b> で垂直プロファイルとバッファーの深さを確認します。</li>"
+        "<li><b>保存 (Export):</b> 自動化された <code>[ Surface ]</code> および <code>[ Cell ]</code> カードを含む <code>.inp</code> ファイルを生成します。</li>"
         "<li><b>実行 (Execute):</b> ユーティリティから直接ローカルのPHITS実行ファイルを呼び出し、輸送計算を開始します。</li>"
         "</ol>"
 
         "<h3>重要な技術的注意点</h3>"
         "<ul>"
-        "<li><b>ジオメトリの検証:</b> 「核のサイズ」が「Major Z」や「細胞サイズ」を超える場合、ジオメトリの重複を防ぐため生成に失敗します。</li>"
+        "<li><b>ジオメトリの検証:</b> 指定されたサイズや比率により、核が細胞内に収まらない場合や、1000回の試行でもランダム配置におけるオーバーラップを回避できない場合、シミュレーションの物理的整合性を守るために生成は中止されます。</li>"
         "<li><b>単位:</b> すべての入力は<b>マイクロメートル (µm)</b> ですが、自動的に変換され、PHITSには<b>センチメートル (cm)</b> でエクスポートされます。</li>"
         "</ul>"
     };
@@ -991,16 +1168,21 @@ void cellmaker::on_pushButton_8_clicked() {
 }
 
 
+
 void cellmaker::renderManualCells() {
     if (currentCellList.isEmpty()) return;
 
+    // check view
+    bool isCurrentlyXZ = false;
+    if (ui->graphicsView->scene() != nullptr && ui->graphicsView->scene() == sceneXZ) {
+        isCurrentlyXZ = true;
+    }
 
     if (sceneXY) { delete sceneXY; sceneXY = nullptr; }
     if (sceneXZ) { delete sceneXZ; sceneXZ = nullptr; }
 
     sceneXY = new QGraphicsScene(this);
     sceneXZ = new QGraphicsScene(this);
-
 
     sceneXY->setBackgroundBrush(QColor(20, 25, 30));
     sceneXZ->setBackgroundBrush(QColor(20, 25, 30));
@@ -1012,12 +1194,12 @@ void cellmaker::renderManualCells() {
     bufferOutline.setStyle(Qt::DashLine);
     QBrush bufferFill(QColor(255, 200, 0, 15));
 
-
     double minX = currentCellList[0].x - currentCellList[0].rx;
     double maxX = currentCellList[0].x + currentCellList[0].rx;
     double minY = currentCellList[0].y - currentCellList[0].rx;
     double maxY = currentCellList[0].y + currentCellList[0].rx;
     double maxZ = currentCellList[0].rz;
+    double minZRender = currentCellList[0].z - currentCellList[0].rz;
 
     for(const auto& cc : currentCellList) {
         minX = qMin(minX, cc.x - cc.rx);
@@ -1025,6 +1207,7 @@ void cellmaker::renderManualCells() {
         minY = qMin(minY, cc.y - cc.rx);
         maxY = qMax(maxY, cc.y + cc.rx);
         maxZ = qMax(maxZ, cc.rz);
+        minZRender = qMin(minZRender, cc.z - cc.rz);
     }
 
     double bufH = ui->lineEdit_2->text().toDouble();
@@ -1047,33 +1230,71 @@ void cellmaker::renderManualCells() {
     }
 
     //XZ view
+    //sceneXZ->addLine(minX-40, 0, maxX+40, 0, QPen(QColor(150, 150, 150), 1.0))->setZValue(0);
+    //sceneXZ->addRect(minX-20, -totalBufZ, (maxX-minX)+40, totalBufZ * 2, bufferOutline, bufferFill)->setZValue(0);
     sceneXZ->addLine(minX-40, 0, maxX+40, 0, QPen(QColor(150, 150, 150), 1.0))->setZValue(0);
-    sceneXZ->addRect(minX-20, -totalBufZ, (maxX-minX)+40, totalBufZ, bufferOutline, bufferFill)->setZValue(0);
 
-    for (const auto& cc : currentCellList) {
-        QLinearGradient cytoGradXZ(cc.x, -cc.rz, cc.x, 0);
-        cytoGradXZ.setColorAt(0.0, QColor(0, 255, 255, 100));
-        cytoGradXZ.setColorAt(1.0, QColor(0, 120, 220, 160));
+    if (is3DMode) {
 
-        QPainterPath dome;
-        dome.moveTo(cc.x + cc.rx, 0);
-        dome.arcTo(cc.x - cc.rx, -cc.rz, cc.rx * 2, cc.rz * 2, 0, 180);
-        dome.lineTo(cc.x - cc.rx, 0);
-        sceneXZ->addPath(dome, cellOutline, QBrush(cytoGradXZ))->setZValue(1);
+        double bottomZRender = minZRender - 20.0;
+        sceneXZ->addRect(minX-20, 0, (maxX-minX)+40, std::abs(bottomZRender), bufferOutline, bufferFill)->setZValue(0);
+    } else {
 
-        double nucCenterZ = -(cc.nz + cc.nrz);
-        QRadialGradient nucGradXZ(cc.nx, nucCenterZ, cc.nrx);
-        nucGradXZ.setFocalPoint(cc.nx - cc.nrx * 0.3, nucCenterZ - cc.nrz * 0.3);
-        nucGradXZ.setColorAt(0.0, QColor(255, 120, 120));
-        nucGradXZ.setColorAt(1.0, QColor(180, 0, 0));
-        sceneXZ->addEllipse(cc.nx - cc.nrx, nucCenterZ - cc.nrz, cc.nrx * 2, cc.nrz * 2, nucleusOutline, QBrush(nucGradXZ))->setZValue(2);
+        sceneXZ->addRect(minX-20, -totalBufZ, (maxX-minX)+40, totalBufZ, bufferOutline, bufferFill)->setZValue(0);
     }
 
-    ui->graphicsView->setScene(sceneXY);
-    ui->graphicsView->resetTransform();
-    ui->graphicsView->fitInView(sceneXY->itemsBoundingRect(), Qt::KeepAspectRatio);
-    ui->graphicsView->scale(0.9, 0.9);
+    for (const auto& cc : currentCellList) {
+        if (is3DMode) {
+
+            QLinearGradient cytoGradXZ(cc.x, -(cc.z + cc.rz), cc.x, -(cc.z - cc.rz));
+            cytoGradXZ.setColorAt(0.0, QColor(0, 255, 255, 100));
+            cytoGradXZ.setColorAt(1.0, QColor(0, 120, 220, 160));
+
+            sceneXZ->addEllipse(cc.x - cc.rx, -(cc.z + cc.rz), cc.rx * 2, cc.rz * 2, cellOutline, QBrush(cytoGradXZ))->setZValue(1);
+
+            double nucCenterZ = -(cc.nz);
+            QRadialGradient nucGradXZ(cc.nx, nucCenterZ, cc.nrx);
+            nucGradXZ.setFocalPoint(cc.nx - cc.nrx * 0.3, nucCenterZ - cc.nrz * 0.3);
+            nucGradXZ.setColorAt(0.0, QColor(255, 120, 120));
+            nucGradXZ.setColorAt(1.0, QColor(180, 0, 0));
+
+            sceneXZ->addEllipse(cc.nx - cc.nrx, nucCenterZ - cc.nrz, cc.nrx * 2, cc.nrz * 2, nucleusOutline, QBrush(nucGradXZ))->setZValue(2);
+        } else {
+
+            QLinearGradient cytoGradXZ(cc.x, -cc.rz, cc.x, 0);
+            cytoGradXZ.setColorAt(0.0, QColor(0, 255, 255, 100));
+            cytoGradXZ.setColorAt(1.0, QColor(0, 120, 220, 160));
+
+            QPainterPath dome;
+            dome.moveTo(cc.x + cc.rx, 0);
+            dome.arcTo(cc.x - cc.rx, -cc.rz, cc.rx * 2, cc.rz * 2, 0, 180);
+            dome.lineTo(cc.x - cc.rx, 0);
+            sceneXZ->addPath(dome, cellOutline, QBrush(cytoGradXZ))->setZValue(1);
+
+            double nucCenterZ = -(cc.nz + cc.nrz);
+            QRadialGradient nucGradXZ(cc.nx, nucCenterZ, cc.nrx);
+            nucGradXZ.setFocalPoint(cc.nx - cc.nrx * 0.3, nucCenterZ - cc.nrz * 0.3);
+            nucGradXZ.setColorAt(0.0, QColor(255, 120, 120));
+            nucGradXZ.setColorAt(1.0, QColor(180, 0, 0));
+            sceneXZ->addEllipse(cc.nx - cc.nrx, nucCenterZ - cc.nrz, cc.nrx * 2, cc.nrz * 2, nucleusOutline, QBrush(nucGradXZ))->setZValue(2);
+        }
+    }
+
+    // user selected view on update
+    if (isCurrentlyXZ) {
+        ui->graphicsView->setScene(sceneXZ);
+        ui->graphicsView->resetTransform();
+        ui->graphicsView->fitInView(sceneXZ->itemsBoundingRect(), Qt::KeepAspectRatio);
+        ui->graphicsView->scale(0.9, 0.9);
+    } else {
+        ui->graphicsView->setScene(sceneXY);
+        ui->graphicsView->resetTransform();
+        ui->graphicsView->fitInView(sceneXY->itemsBoundingRect(), Qt::KeepAspectRatio);
+        ui->graphicsView->scale(0.9, 0.9);
+    }
 }
+
+
 
 void cellmaker::on_actionSave_Model_triggered()
 {
@@ -1091,4 +1312,3 @@ void cellmaker::on_actionManual_triggered()
 {
     on_pushButton_8_clicked();
 }
-
