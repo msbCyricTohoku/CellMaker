@@ -107,7 +107,7 @@ QList<CompleteCell> ManualArrangeDialog::getFinalCells() {
     double userRadius = spinRandomRadius->value();
     const int maxAttempts = 2000;
 
-    // calculate actual Z dimen.
+    // calc Z dimens. based on the user ratio
     double actualCellRz = (defCellSize / 2.0) * spinCellZRatio->value();
     double actualNucRz = (defNucSize / 2.0) * spinNucZRatio->value();
 
@@ -174,7 +174,7 @@ QList<CompleteCell> ManualArrangeDialog::getFinalCells() {
 
                     if (!placed) {
                         QMessageBox::warning(this, "Placement Error",
-                                             "Unable to place cells without overlap. Please change the random radius or cell parameters.");
+                                             "Unable to place cells without overlap. Try changing the Random Radius or the Cell Pitch.");
                         placementOk = false;
                         cells.clear();
                         break;
@@ -189,15 +189,20 @@ QList<CompleteCell> ManualArrangeDialog::getFinalCells() {
                 cc.rx = defCellSize / 2.0;
                 cc.rz = actualCellRz;
 
-
                 cc.majorX = 0.0;
                 cc.majorY = 0.0;
 
                 cc.nrx = defNucSize / 2.0;
                 cc.nrz = actualNucRz;
 
-                double safeRx = cc.rx - cc.nrx - 0.000001;
-                double safeRz = cc.rz - cc.nrz - 0.000001;
+                //normalized scale factor to ensure nucleus does not go out of bound
+                double ratioX = cc.nrx / cc.rx;
+                double ratioZ = cc.nrz / cc.rz;
+                double S = std::max(ratioX, ratioZ); // find the tightest constraint
+
+                double safeRx = cc.rx * (1.0 - S) - 0.000001;
+                double safeRz = cc.rz * (1.0 - S) - 0.000001;
+
                 if (safeRx < 0) safeRx = 0;
                 if (safeRz < 0) safeRz = 0;
 

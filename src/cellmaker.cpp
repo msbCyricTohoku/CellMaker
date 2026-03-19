@@ -388,6 +388,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
             << " $in-vitro medium buffer" << Qt::endl;
     }
 
+    /*
 
     // the planes
     int pz_bottom = nextId++; // equivalent to 11 in old code
@@ -403,6 +404,27 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
     out << QString("%1  PX  0.50").arg(px_p) << Qt::endl;
     int px_m = nextId++;
     out << QString("%1  PX -0.50").arg(px_m) << Qt::endl;
+    */
+
+    // bug fix here, no cutting plane needed when cells are full shape
+    //int pz_bottom = 0, pz_top = 0, py_p = 0, py_m = 0, px_p = 0, px_m = 0;
+
+    int pz_top = 0;
+
+    if (!is3DMode) {
+        //pz_bottom = nextId++; // equivalent to 11 in old code
+        pz_top = nextId++;    // equivalent to 12
+        //out << QString("%1  PZ  -2.0e-5").arg(pz_bottom) << Qt::endl;
+        out << QString("%1  PZ  0.0").arg(pz_top) << Qt::endl;
+        //py_p = nextId++;
+        //out << QString("%1  PY  0.50").arg(py_p) << Qt::endl;
+        //py_m = nextId++;
+        //out << QString("%1  PY -0.50").arg(py_m) << Qt::endl;
+        //px_p = nextId++;
+        //out << QString("%1  PX  0.50").arg(px_p) << Qt::endl;
+        //px_m = nextId++;
+        //out << QString("%1  PX -0.50").arg(px_m) << Qt::endl;
+    }
 
     // le void
     out << "4000   SO   500.0 $outer boundary" << Qt::endl;
@@ -528,7 +550,9 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
                .arg(containerId)
                .arg(pz_top)
         << positiveCytoSurfaces << " $optimized buffer" << Qt::endl;
-    */
+
+
+    if (!is3DMode) {
 
     // le buffer
     out << QString("3001  %1 -%2 %3 -%4 -%5 %6 -%7 %8")
@@ -541,6 +565,9 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
                .arg(px_p)
                .arg(px_m)
         << Qt::endl;
+
+    }
+*/
 
     // optimized outer world cell (4001)
     // complement operator (:) to define everything outside the RPP container
@@ -564,7 +591,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
 
     } else {
 
-        out << QString("4001 %1 %2 -4000  ( %3 : -%4 ) #3001")
+        out << QString("4001 %1 %2 -4000  ( %3 : -%4 )")
                    .arg(num_materials + 1)
                    .arg(Airdensity)
                    .arg(containerId)
@@ -1290,7 +1317,8 @@ void cellmaker::renderManualCells() {
         ui->graphicsView->setScene(sceneXY);
         ui->graphicsView->resetTransform();
         ui->graphicsView->fitInView(sceneXY->itemsBoundingRect(), Qt::KeepAspectRatio);
-        ui->graphicsView->scale(0.9, 0.9);
+        //ui->graphicsView->scale(0.9, 0.9);
+        ui->graphicsView->scale(0.9, -0.9);
     }
 }
 
