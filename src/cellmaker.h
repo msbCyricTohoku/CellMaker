@@ -44,7 +44,7 @@ private slots:
 
     void phitsScriptGen(const QString &path, const QString &maxcas, const QString &maxbch, const QString sourceType,
                         const QString proj, const QString r0, const QString z0, const QString e0,
-                        QList<CompleteCell> cells, double bufH, double majorZ,int cytoMatNo,int nucMatNo,int buffMatNo, bool is3DMode);
+                        QList<CompleteCell> cells, double bufH,int cytoMatNo,int nucMatNo,int buffMatNo, bool is3DMode);
 
 
 

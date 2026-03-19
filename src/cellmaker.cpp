@@ -135,7 +135,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
                                const QString proj, const QString r0,
                                const QString z0, const QString e0,
                                QList<CompleteCell> cells, double bufH,
-                               double majorZ, int cytoMatNo, int nucMatNo,
+                               int cytoMatNo, int nucMatNo,
                                int buffMatNo, bool is3DMode) {
 
 
@@ -230,7 +230,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
 
     }
 
-    out << QString("set: c31[%1] $ Buffer Half-Width").arg(halfGrid, 8, 'f', 6) << Qt::endl;
+    out << QString("set: c31[%1] $ Buffer Half Width").arg(halfGrid, 8, 'f', 6) << Qt::endl;
 
     out << "\n";
 
@@ -348,21 +348,26 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
         const auto &cell = cells[i];
 
         QString nucZStr;
+
         if (is3DMode) {
-            // Gap between the cell's bottom edge and the buffer boundary
+
             double bottomGap = (cell.z - cell.rz) - bufferBottom;
+
             QString gapStr = QString(bottomGap >= 0 ? "+%1" : "%1").arg(bottomGap, 0, 'f', 6);
 
-            // Calculate proportional Z offset of nucleus relative to cell center
+            // proportional Z offset of nucleus relative to cell center
             double dnz = cell.nz - cell.z;
+
             double nucRatio = dnz / ref_rz;
+
             QString ratioStr = QString(nucRatio >= 0 ? "+%1*c11" : "%1*c11").arg(nucRatio, 0, 'f', 6);
 
             // Nucleus Z = BufferBottom + Gap + CellRadius + NucleusRelativeOffset
             nucZStr = QString("(c30%1+c11%2)").arg(gapStr).arg(ratioStr);
         } else {
-            // 2D Mode: Domes rest at Z=0. Nucleus height scales with c11.
+
             double nucRatio = cell.nz / ref_rz;
+
             nucZStr = QString("(%1*c11)").arg(nucRatio, 0, 'f', 6);
         }
 
@@ -370,7 +375,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
                     .arg(cell.nucSurfId, -3)
                     .arg(cell.nx, 8, 'f', 6)
                     .arg(cell.ny, 8, 'f', 6)
-                    .arg(nucZStr) // Inject the mathematical string
+                    .arg(nucZStr)
             << " $nucleus" << Qt::endl;
     }
 
@@ -380,23 +385,26 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
 
         QString cellZStr;
         if (is3DMode) {
-            // Gap between the cell's bottom edge and the buffer boundary
+
             double bottomGap = (cell.z - cell.rz) - bufferBottom;
+
             QString gapStr = QString(bottomGap >= 0 ? "+%1" : "%1").arg(bottomGap, 0, 'f', 6);
 
             // Cell Z = BufferBottom + Gap + CellRadius
             cellZStr = QString("(c30%1+c11)").arg(gapStr);
+
         } else {
-            // 2D Mode: Glass slide is at Z=0, domes scale upward from 0
+
+            // 2d mode
             cellZStr = "0.0";
         }
 
-        // Ellipsoid of revolution
+        // cell cytoplasm
         out << QString("%1  ELL  %2 %3 %4  0 0 c11  -c10")
                     .arg(cell.cellSurfId, -3)
                     .arg(cell.x, 8, 'f', 6)
                     .arg(cell.y, 8, 'f', 6)
-                    .arg(cellZStr) // Inject the mathematical string
+                    .arg(cellZStr)
             << " $cytoplasm" << Qt::endl;
     }
     /*******************************************************/
@@ -1060,7 +1068,7 @@ void cellmaker::on_pushButton_7_clicked() {
     double bufH = bufHString.toDouble();
 
 
-    double majorZ = 0.0;
+    //double majorZ = 0.0;
 
     int cytoMatNo = ui->comboBox_4->currentIndex();
     int nucMatNo = ui->comboBox_5->currentIndex();
@@ -1080,7 +1088,7 @@ void cellmaker::on_pushButton_7_clicked() {
     }
 
     phitsScriptGen(saveFilePath, maxcas, maxbch, sourceType, proj, r0,
-                   z0, e0, currentCellList, bufH, majorZ, cytoMatNo, nucMatNo,
+                   z0, e0, currentCellList, bufH, cytoMatNo, nucMatNo,
                    buffMatNo, is3DMode);
 
     ui->textBrowser->append("\n<font color='blue'>File saved to: " + saveFilePath + "</font>");
