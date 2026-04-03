@@ -63,6 +63,8 @@ private slots:
 
     void on_actionManual_triggered();
 
+    void on_comboBox_8_currentTextChanged(const QString &arg1);
+
 private:
     Ui::cellmaker *ui;
     QList<CompleteCell> currentCellList;

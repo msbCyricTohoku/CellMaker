@@ -8,13 +8,11 @@ CONFIG += c++17
 
 SOURCES += \
     src/main.cpp \
-    src/cellmaker.cpp \
-    src/manualarrangedialog.cpp
+    src/cellmaker.cpp
 
 HEADERS += \
     src/celldata.h \
-    src/cellmaker.h \
-    src/manualarrangedialog.h
+    src/cellmaker.h
 
 FORMS += \
     src/cellmaker.ui

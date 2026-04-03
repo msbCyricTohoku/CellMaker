@@ -27,7 +27,7 @@
 #include <QTextBrowser>
 #include <QPushButton>
 #include <QPdfWriter>
-#include "manualarrangedialog.h"
+//#include "manualarrangedialog.h"
 
 cellmaker::cellmaker(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::cellmaker) {
@@ -38,7 +38,7 @@ cellmaker::cellmaker(QWidget *parent)
 
     ui->graphicsView->viewport()->installEventFilter(this);
 
-    ui->lineEdit_6->setText("3");
+    ui->lineEdit_5->setText("3");
 
     ui->lineEdit->setText("30");
 
@@ -60,7 +60,7 @@ cellmaker::cellmaker(QWidget *parent)
 
     ui->comboBox->addItem("Uniform");
     ui->comboBox->addItem("Random");
-    ui->comboBox->addItem("3D in-vivo");
+   // ui->comboBox->addItem("3D in-vivo");
 
     ui->comboBox_2->addItem("proton");
     ui->comboBox_2->addItem("neutron");
@@ -108,6 +108,19 @@ cellmaker::cellmaker(QWidget *parent)
     ui->lineEdit_13->setText("10");
 
     ui->checkBox_4->setChecked(true);
+
+
+    ui->comboBox_8->addItem("2D (in-vitro)");
+    ui->comboBox_8->addItem("3D (in-vivo)");
+
+    ui->lineEdit_ZCells->setText("3");
+    ui->lineEdit_PitchZ->setText("0.0");
+
+
+    on_comboBox_8_currentTextChanged(ui->comboBox_8->currentText());
+
+    connect(ui->comboBox_8, &QComboBox::currentTextChanged,
+            this, &cellmaker::on_comboBox_8_currentTextChanged);
 }
 
 cellmaker::~cellmaker() { delete ui; }
@@ -721,7 +734,7 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
         if (is3DMode) {
             out << "c30 0.000" << Qt::endl;
         } else {
-            out << "0.000 c30" << Qt::endl;
+            out << "0.000 c11" << Qt::endl;
         }
         out << "axis = xy" << Qt::endl;
         out << "file = tracks.out" << Qt::endl;
@@ -732,6 +745,8 @@ void cellmaker::phitsScriptGen(const QString &path, const QString &maxcas,
         out << "part = all" << Qt::endl;
         out << "material = all" << Qt::endl;
         out << "epsout = 1" << Qt::endl;
+        out << "gshow = 3" << Qt::endl;
+        out << "angel = cmum" << Qt::endl;
     }
 
     if (ui->checkBox->isChecked()) {
@@ -817,149 +832,231 @@ void cellmaker::on_pushButton_clicked() {
     ui->textBrowser->setText("");
     QRandomGenerator *generator = QRandomGenerator::global();
 
+    //check user mode
+    is3DMode = (ui->comboBox_8->currentText() == "3D (in-vivo)");
+    QString cytoplasmType = ui->comboBox->currentText(); // "Uniform" or "Random"
 
-    int cellNo = ui->lineEdit_6->text().toInt();
+    int cellNo = ui->lineEdit_5->text().toInt(); //cells in X and Y
+
     double cellSize = ui->lineEdit->text().toDouble();
-    double nucleusSize = ui->lineEdit_10->text().toDouble();
-    double CellPitch = ui->lineEdit_11->text().toDouble();
 
-    // read ratios
+  double nucleusSize = ui->lineEdit_10->text().toDouble();
+   double CellPitch = ui->lineEdit_11->text().toDouble();
+
+
+   double depth = ui->lineEdit_2->text().toDouble();
+
+    //the ratios
     double cellZRatio = ui->lineEdit_3->text().toDouble();
-    if (cellZRatio <= 0.0) cellZRatio = 0.5; // Safety fallback
 
-    double nucZRatio = ui->lineEdit_4->text().toDouble();
-    if (nucZRatio <= 0.0) nucZRatio = 0.8; // Safety fallback
+   if (cellZRatio <= 0.0) cellZRatio = 0.5;
 
-    // calc. actual Z radii based on XY radii and user ratios
+   double nucZRatio = ui->lineEdit_4->text().toDouble();
+
+   if (nucZRatio <= 0.0) nucZRatio = 0.8;
+
+    //Z radii
     double actualCellRz = (cellSize / 2.0) * cellZRatio;
     double actualNucRz = (nucleusSize / 2.0) * nucZRatio;
 
-    double spacing = cellSize + CellPitch;
-    double totalSpan = (cellNo - 1) * spacing;
-    double halfSpan = totalSpan / 2.0;
-
-    QString cytoplasmType = ui->comboBox->currentText();
-
+    double spacingXY = cellSize + CellPitch;
+    double totalSpanXY = (cellNo - 1) * spacingXY;
+    double halfSpanXY = totalSpanXY / 2.0;
 
     double userRadius = 0.0;
-    if (cytoplasmType == "Random" || cytoplasmType == "3D in-vivo") {
-        //userRadius = cellSize / 2.0;
+    if (cytoplasmType == "Random") {
         userRadius = ui->spinBoxRandomRadius->value();
     }
 
     const int maxAttempts = 1000;
-
-    QVector<QPointF> placedCenters;
     bool placementOk = true;
     currentCellList.clear();
 
+    if (is3DMode) {
 
-    // 3D in-vivo cell array definition
-    if (cytoplasmType == "3D in-vivo") {
-        ManualArrangeDialog dlg(this);
+        //3D in-vivo
+        int nzCount = ui->lineEdit_ZCells->text().toInt();
+        double pitchZ = ui->lineEdit_PitchZ->text().toDouble();
 
-        dlg.setDefaultParams(cellSize, nucleusSize, cellNo, CellPitch, userRadius, cellZRatio, nucZRatio);
+        double safeCollisionDist = std::max(cellSize, actualCellRz * 2.0);
+        double spacingZ = (actualCellRz * 2.0) + pitchZ;
+        double zOffset = (cytoplasmType == "Random") ? userRadius : 0.0;
 
-        if (dlg.exec() == QDialog::Accepted) {
-            currentCellList = dlg.getFinalCells();
+        int idCounter = 1;
 
-            if (currentCellList.isEmpty()) {
-                ui->textBrowser->setText(tr("<font color='red'>Error: Generation aborted.</font>"));
-                return;
-            }
+        for (int k = 0; k < nzCount && placementOk; ++k) {
+            for (int i = 0; i < cellNo && placementOk; ++i) {
+                for (int j = 0; j < cellNo && placementOk; ++j) {
 
-            is3DMode = true;
-            renderManualCells();
-        }
-        return;
-    }
+                    double baseCx = (i * spacingXY) - halfSpanXY;
+                    double baseCy = (j * spacingXY) - halfSpanXY;
+                    double baseCz = -depth - actualCellRz - zOffset - (k * spacingZ);
 
-    is3DMode = false;
+                    double cx = baseCx, cy = baseCy, cz = baseCz;
 
+                    if (cytoplasmType == "Random") {
+                        int attempts = 0;
+                        bool placed = false;
+                        while (attempts < maxAttempts && !placed) {
+                            double u, v, w, distSq;
+                            do {
+                                u = (generator->generateDouble() * 2.0) - 1.0;
+                                v = (generator->generateDouble() * 2.0) - 1.0;
+                                w = (generator->generateDouble() * 2.0) - 1.0;
+                                distSq = (u*u) + (v*v) + (w*w);
+                            } while (distSq > 1.0 || distSq == 0.0);
 
-    // 2D cell array data generation
-    for (int i = 0; i < cellNo && placementOk; ++i) {
-        for (int j = 0; j < cellNo && placementOk; ++j) {
-            double baseCx = (i * spacing) - halfSpan;
-            double baseCy = (j * spacing) - halfSpan;
-            double cz = 0.0;
-            double cx = baseCx;
-            double cy = baseCy;
+                            double candCx = baseCx + (u * userRadius);
+                            double candCy = baseCy + (v * userRadius);
+                            double candCz = baseCz + (w * userRadius);
 
-            if (cytoplasmType == "Random") {
-                int attempts = 0;
-                bool placed = false;
-                while (attempts < maxAttempts && !placed) {
-                    double thetaPos = 2.0 * M_PI * generator->generateDouble();
-                    double rPos = userRadius * std::sqrt(generator->generateDouble());
+                            bool validPlacement = true;
+                            for (const CompleteCell &placedCell : currentCellList) {
+                                double dx = candCx - placedCell.x;
+                                double dy = candCy - placedCell.y;
+                                double dz = candCz - placedCell.z;
+                                if (std::sqrt(dx*dx + dy*dy + dz*dz) < safeCollisionDist) {
+                                    validPlacement = false;
+                                    break;
+                                }
+                            }
 
-                    double candCx = baseCx + rPos * std::cos(thetaPos);
-                    double candCy = baseCy + rPos * std::sin(thetaPos);
+                            if (validPlacement) {
+                                cx = candCx; cy = candCy; cz = candCz;
+                                placed = true;
+                            }
+                            ++attempts;
+                        }
 
-                    bool overlap = false;
-                    for (const QPointF &p : placedCenters) {
-                        if (std::hypot(candCx - p.x(), candCy - p.y()) < cellSize) {
-                            overlap = true;
+                        if (!placed) {
+                            ui->textBrowser->setText(tr("<font color='red'>Error: Unable to place 3D cells without overlap.</font>"));
+                            placementOk = false;
+                            currentCellList.clear();
                             break;
                         }
                     }
 
-                    if (!overlap) {
-                        cx = candCx;
-                        cy = candCy;
-                        placed = true;
-                        placedCenters.append(QPointF(cx, cy));
+                    CompleteCell cc;
+                    cc.x = cx; cc.y = cy; cc.z = cz;
+                    cc.rx = cellSize / 2.0;
+                    cc.rz = actualCellRz;
+                    cc.majorX = 0.0;
+                    cc.majorY = 0.0;
+                    cc.nrx = nucleusSize / 2.0;
+                    cc.nrz = actualNucRz;
+
+                    double ratioX = cc.nrx / cc.rx;
+                    double ratioZ = cc.nrz / cc.rz;
+                    double S = std::max(ratioX, ratioZ);
+
+                    double safeRx = cc.rx * (1.0 - S) - 0.000001;
+                    double safeRz = cc.rz * (1.0 - S) - 0.000001;
+                    if (safeRx < 0) safeRx = 0;
+                    if (safeRz < 0) safeRz = 0;
+
+                    double u, v, w, distSq;
+                    do {
+                        u = (generator->generateDouble() * 2.0) - 1.0;
+                        v = (generator->generateDouble() * 2.0) - 1.0;
+                        w = (generator->generateDouble() * 2.0) - 1.0;
+                        distSq = (u*u) + (v*v) + (w*w);
+                    } while (distSq > 1.0);
+
+                    cc.nx = cc.x + (u * safeRx);
+                    cc.ny = cc.y + (v * safeRx);
+                    cc.nz = cc.z + (w * safeRz);
+
+                    cc.cellSurfId = idCounter;
+                    cc.nucSurfId = idCounter + (cellNo * cellNo * nzCount);
+                    currentCellList.append(cc);
+
+                    idCounter++;
+                }
+            }
+        }
+    } else {
+
+        //2D in-vitro
+        QVector<QPointF> placedCenters;
+
+        for (int i = 0; i < cellNo && placementOk; ++i) {
+            for (int j = 0; j < cellNo && placementOk; ++j) {
+                double baseCx = (i * spacingXY) - halfSpanXY;
+                double baseCy = (j * spacingXY) - halfSpanXY;
+                double cz = 0.0;
+                double cx = baseCx, cy = baseCy;
+
+                if (cytoplasmType == "Random") {
+                    int attempts = 0;
+                    bool placed = false;
+                    while (attempts < maxAttempts && !placed) {
+
+                        double thetaPos = 2.0 * M_PI * generator->generateDouble();
+
+                        double rPos = userRadius * std::sqrt(generator->generateDouble());
+
+                        double candCx = baseCx + rPos * std::cos(thetaPos);
+
+                        double candCy = baseCy + rPos * std::sin(thetaPos);
+
+                        bool overlap = false;
+                        for (const QPointF &p : placedCenters) {
+                            if (std::hypot(candCx - p.x(), candCy - p.y()) < cellSize) {
+                                overlap = true;
+                                break;
+                            }
+                        }
+
+                        if (!overlap) {
+                            cx = candCx; cy = candCy;
+                            placed = true;
+                            placedCenters.append(QPointF(cx, cy));
+                        }
+                        ++attempts;
                     }
-                    ++attempts;
+
+                    if (!placed) {
+                        ui->textBrowser->setText(tr("<font color='red'>Error: Unable to place 2D cells without overlap.</font>"));
+                        placementOk = false;
+                        break;
+                    }
+                } else {
+                    placedCenters.append(QPointF(cx, cy));
                 }
 
-                if (!placed) {
-                    ui->textBrowser->setText(tr("<font color='red'>Error: Unable to place cells without overlap.</font>"));
+                CompleteCell cc;
+                cc.x = cx; cc.y = cy; cc.z = cz;
+                cc.rx = cellSize / 2.0;
+                cc.rz = actualCellRz;
+                cc.nrx = nucleusSize / 2.0;
+                cc.nrz = actualNucRz;
+                cc.majorX = 0.0;
+                cc.majorY = 0.0;
+
+                double minNz = cc.nrz + 0.000001;
+                double maxNz = cc.rz * std::sqrt(1.0 - std::pow(cc.nrx / cc.rx, 2)) - cc.nrz - 0.000001;
+
+                if (maxNz < minNz || cc.nrx >= cc.rx) {
+                    ui->textBrowser->setText(tr("<font color='red'>Error: Nucleus is too large or ratio causes protrusion.</font>"));
                     placementOk = false;
-                    break;
+                    continue;
                 }
-            } else {
-                placedCenters.append(QPointF(cx, cy));
+
+                cc.nz = minNz + (maxNz - minNz) * generator->generateDouble();
+                double safeCellRx = cc.rx * std::sqrt(1.0 - std::pow((cc.nz + cc.nrz) / cc.rz, 2));
+
+                double maxLateralOffset = safeCellRx - cc.nrx - 0.000001;
+                if (maxLateralOffset < 0) maxLateralOffset = 0;
+
+                double theta = 2.0 * M_PI * generator->generateDouble();
+                double r = maxLateralOffset * std::sqrt(generator->generateDouble());
+                cc.nx = cc.x + r * std::cos(theta);
+                cc.ny = cc.y + r * std::sin(theta);
+
+                cc.cellSurfId = currentCellList.size() + 1;
+                cc.nucSurfId = cc.cellSurfId + (cellNo * cellNo);
+                currentCellList.append(cc);
             }
-
-            CompleteCell cc;
-            cc.x = cx; cc.y = cy; cc.z = cz;
-
-            // calculated radii
-            cc.rx = cellSize / 2.0;
-            cc.rz = actualCellRz;
-
-            cc.nrx = nucleusSize / 2.0;
-            cc.nrz = actualNucRz;
-
-            // set major axis X and Y to zero
-            cc.majorX = 0.0;
-            cc.majorY = 0.0;
-
-            // valid Z space for 2D dome nucleus
-            double minNz = cc.nrz + 0.000001;
-            double maxNz = cc.rz * std::sqrt(1.0 - std::pow(cc.nrx / cc.rx, 2)) - cc.nrz - 0.000001;
-
-            if (maxNz < minNz || cc.nrx >= cc.rx) {
-                ui->textBrowser->setText(tr("<font color='red'>Error: Nucleus is too large or ratio causes protrusion.</font>"));
-                placementOk = false;
-                continue;
-            }
-
-            cc.nz = minNz + (maxNz - minNz) * generator->generateDouble();
-            double safeCellRx = cc.rx * std::sqrt(1.0 - std::pow((cc.nz + cc.nrz) / cc.rz, 2));
-
-            double maxLateralOffset = safeCellRx - cc.nrx - 0.000001;
-            if (maxLateralOffset < 0) maxLateralOffset = 0;
-
-            double theta = 2.0 * M_PI * generator->generateDouble();
-            double r = maxLateralOffset * std::sqrt(generator->generateDouble());
-            cc.nx = cc.x + r * std::cos(theta);
-            cc.ny = cc.y + r * std::sin(theta);
-
-            cc.cellSurfId = currentCellList.size() + 1;
-            cc.nucSurfId = cc.cellSurfId + (cellNo * cellNo);
-            currentCellList.append(cc);
         }
     }
 
@@ -967,7 +1064,9 @@ void cellmaker::on_pushButton_clicked() {
 
     renderManualCells();
 
-    ui->textBrowser->append("\n<font color='green'>2D Models generated successfully! Scroll to zoom.</font>");
+    QString successMsg = is3DMode ? "\n<font color='green'>3D In-Vivo Models generated successfully! Scroll to zoom.</font>"
+                                  : "\n<font color='green'>2D In-Vitro Models generated successfully! Scroll to zoom.</font>";
+    ui->textBrowser->append(successMsg);
 }
 
 
@@ -996,11 +1095,16 @@ void cellmaker::on_pushButton_4_clicked() { QApplication::quit(); }
 
 void cellmaker::on_pushButton_3_clicked() {
     QMessageBox::about(
-        this, tr("CellMaker Program"),
-        tr("Generate Cell Arrays for Monte Carlo Radiation Transport Studies.\n"
-           "Developed by: Mehrdad S. Beni and Hiroshi Watabe, RARiS, Tohoku "
-           "University, JAPAN -- 2026\n"
-           "Version 1.0.0"));
+        this, tr("About CellMaker"),
+        tr("<h3>CellMaker</h3>"
+           "<p>Generate Cell Arrays for Monte Carlo Radiation Transport Studies.</p>"
+           "<p><b>Developed by:</b><br/>"
+           "Dr. Mehrdad S. Beni & Prof. Hiroshi Watabe<br/>"
+           "<i>RARiS, Tohoku University, JAPAN &mdash; 2026</i></p>"
+           "<p><b>Special Thanks:</b><br/>"
+           "Prof. Tatsuhiko Sato (JAEA), for their invaluable contributions in expanding the feature set and significantly enhancing the capabilities of this software.</p>"
+           "<p><b>Version 1.0.0</b></p>")
+        );
 }
 
 void cellmaker::on_actionQuit_triggered() { on_pushButton_4_clicked(); }
@@ -1119,7 +1223,7 @@ void cellmaker::on_checkBox_4_stateChanged(int arg1)
 void cellmaker::on_pushButton_8_clicked() {
     QDialog *tutorialDialog = new QDialog(this);
     tutorialDialog->setWindowTitle(tr("PHITS CellMaker User Manual"));
-    tutorialDialog->resize(800, 700);
+    tutorialDialog->resize(900, 700);
 
     QVBoxLayout *layout = new QVBoxLayout(tutorialDialog);
     QHBoxLayout *topButtons = new QHBoxLayout();
@@ -1129,27 +1233,26 @@ void cellmaker::on_pushButton_8_clicked() {
         QString content;
     };
 
-
     // --- ENGLISH MANUAL ---
     ManualText english = {
         "<h2 style='color: #0078D7;'>PHITS CellMaker Overview</h2>"
-        "<p>This utility automates the creation of complex 2D semi-ellipsoid and 3D full-ellipsoid multi cell geometries for PHITS Monte Carlo simulations. "
+        "<p>This utility automates the creation of complex 2D semi-ellipsoid and 3D full-ellipsoid multi-cell geometries for PHITS Monte Carlo simulations. "
         "The tool ensures all components are mathematically contained within their respective boundaries, preventing geometry overlaps and errors.</p>"
 
         "<h3>1. Physical Geometry and Shape</h3>"
         "<ul>"
-        "<li><b>Cell Shape:</b> Depending on the selected mode (under Cell Distribution dropdown menu), cells are modeled as either <b>2D semi-ellipsoids (domes)</b> resting on the Z=0 plane, or <b>3D full ellipsoids</b> submerged in tissue. "
+        "<li><b>Cell Shape:</b> Depending on the selected mode (<b>2D In-Vitro</b> or <b>3D In-Vivo</b>), cells are modeled as either <b>2D semi-ellipsoids (domes)</b> resting on the Z=0 plane, or <b>3D full ellipsoids</b> submerged in tissue. "
         "The shape is controlled by a <b>'Z-to-XY Ratio'</b> (e.g., a ratio of 0.5 creates a realistic flattened cell based on the defined radius).</li>"
         "<li><b>Nucleus Shape & Placement:</b> The nucleus is modeled as a 3D <b>ellipsoid</b> using its own specific Z-to-XY Ratio. "
         "The software randomly positions it within the cytoplasm in full 3D space, mathematically ensuring it never protrudes through the cell membrane.</li>"
-        "<li><b>Medium / Tissue Buffer:</b> For 2D <i>in-vitro</i> studies, the buffer extends upward from the floor. For 3D <i>in-vivo</i> modeling, "
-        "it extends downwards from the tissue surface (Z=0) to completely submerge the cell array at user specified depth.</li>"
+        "<li><b>Medium / Tissue Buffer:</b> For <b>2D In-Vitro</b> studies, the buffer extends upward from the floor. For <b>3D In-Vivo</b> modeling, "
+        "it extends downwards from the tissue surface (Z=0) to completely submerge the cell array at the user-specified depth.</li>"
         "</ul>"
 
         "<h3>2. Array Distribution and Spacing</h3>"
         "<ul>"
-        "<li><b>2D Array (uniform / random):</b> Generates a flat N x N grid of dome cells.</li>"
-        "<li><b>3D In-Vivo Array:</b> Generates an N x N x Z multi layer grid of full ellipsoids. You can specify the exact <b>Depth In-Vivo</b> to submerge the highest cells below the surface.</li>"
+        "<li><b>2D In-Vitro Array:</b> Generates a flat N x N grid of dome cells.</li>"
+        "<li><b>3D In-Vivo Array:</b> Generates an N x N x Z multi-layer grid of full ellipsoids. Use <b>Z-Axis Layers</b> to define the number of vertical cellular layers, and <b>Z-Axis Spacing (µm)</b> to set the vertical distance between them. You can also specify the exact <b>Depth In-Vivo</b> to submerge the highest cells below the surface.</li>"
         "<li><b>Uniform vs. Random:</b> 'Uniform' creates a perfect mathematical lattice. 'Random' safely shifts cells in 2D or 3D space within a defined 'Random Radius' "
         "to simulate realistic, non-idealized biological distributions. The algorithm rigorously checks to ensure random shifts never cause cell overlaps or breach the defined tissue depth.</li>"
         "</ul>"
@@ -1171,56 +1274,57 @@ void cellmaker::on_pushButton_8_clicked() {
 
         "<h3>Important Technical Notes</h3>"
         "<ul>"
-        "<li><b>Geometry Validation:</b> If the user defined sizes or ratios result in a nucleus that is too large to fit safely inside the cell, or if random placement fails to resolve overlaps within 1000 attempts, generation will abort to protect the simulation physics.</li>"
+        "<li><b>Geometry Validation:</b> If the user-defined sizes or ratios result in a nucleus that is too large to fit safely inside the cell, or if random placement fails to resolve overlaps within 1000 attempts, generation will abort to protect the simulation physics.</li>"
         "<li><b>Units:</b> All inputs are in <b>micrometers (µm)</b>, but are automatically converted and exported to PHITS in <b>centimeters (cm)</b>.</li>"
+        "<li><b>PHIG-3D:</b>If you want to visualize the cell geometry using PHIG-3D, please select <b>“Marching Cubes”</b> as the default method.</b>.</li>"
         "</ul>"
     };
 
     // --- JAPANESE MANUAL ---
     ManualText japanese = {
-                           "<h2 style='color: #0078D7;'>PHITS CellMaker の概要</h2>"
-                           "<p>このユーティリティは、PHITSモンテカルロシミュレーション用の複雑な2次元半楕円体および3次元楕円体の多細胞ジオメトリの作成を自動化します。"
-                           "このツールは、すべてのコンポーネントが数学的にそれぞれの境界内に収まることを保証し、ジオメトリの重複やエラーを防ぎます。</p>"
+        "<h2 style='color: #0078D7;'>PHITS CellMaker の概要</h2>"
+        "<p>このユーティリティは、PHITSモンテカルロシミュレーション用の複雑な2次元半楕円体および3次元楕円体の多細胞ジオメトリの作成を自動化します。"
+        "このツールは、すべてのコンポーネントが数学的にそれぞれの境界内に収まることを保証し、ジオメトリの重複やエラーを防ぎます。</p>"
 
-                           "<h3>1. 物理的ジオメトリと形状</h3>"
-                           "<ul>"
-                           "<li><b>細胞の形状:</b> （Cell Distribution ドロップダウンメニューで）選択したモードに応じて、細胞はZ=0平面上に配置された<b>2次元半楕円体（ドーム型）</b>、または組織内に沈められた<b>3次元完全楕円体</b>としてモデル化されます。"
-                           "形状は<b>「Z-to-XY Ratio (Z/XY比)」</b>によって制御されます（例：比率を0.5にすると、指定した半径に基づいて現実的な扁平な細胞が作成されます）。</li>"
-                           "<li><b>細胞核の形状と配置:</b> 細胞核は、独自のZ/XY比を用いた3次元<b>楕円体</b>としてモデル化されます。"
-                           "ソフトウェアは、核を細胞質内の3次元空間にランダムに配置しますが、細胞膜から突き出ないよう数学的に保証しています。</li>"
-                           "<li><b>媒質 / 組織バッファ:</b> 2次元の<i>in-vitro</i>（試験管内）研究では、バッファは底面から上方へ拡張します。3次元の<i>in-vivo</i>（生体内）モデリングでは、"
-                           "組織表面（Z=0）から下方へ拡張し、ユーザーが指定した深さで細胞アレイを完全に沈めます。</li>"
-                           "</ul>"
+        "<h3>1. 物理的ジオメトリと形状</h3>"
+        "<ul>"
+        "<li><b>細胞の形状:</b> 選択したモード（<b>2D In-Vitro</b> または <b>3D In-Vivo</b>）に応じて、細胞はZ=0平面上に配置された<b>2次元半楕円体（ドーム型）</b>、または組織内に沈められた<b>3次元完全楕円体</b>としてモデル化されます。"
+        "形状は<b>「Z-to-XY Ratio (Z/XY比)」</b>によって制御されます（例：比率を0.5にすると、指定した半径に基づいて現実的な扁平な細胞が作成されます）。</li>"
+        "<li><b>細胞核の形状と配置:</b> 細胞核は、独自のZ/XY比を用いた3次元<b>楕円体</b>としてモデル化されます。"
+        "ソフトウェアは、核を細胞質内の3次元空間にランダムに配置しますが、細胞膜から突き出ないよう数学的に保証しています。</li>"
+        "<li><b>媒質 / 組織バッファ:</b> <b>2D In-Vitro</b>（試験管内）モデリングでは、バッファは底面から上方へ拡張します。<b>3D In-Vivo</b>（生体内）モデリングでは、"
+        "組織表面（Z=0）から下方へ拡張し、ユーザーが指定した深さで細胞アレイを完全に沈めます。</li>"
+        "</ul>"
 
-                           "<h3>2. アレイの配置と間隔</h3>"
-                           "<ul>"
-                           "<li><b>2D Array (均等 / ランダム):</b> ドーム型細胞の平坦な N x N グリッドを生成します。</li>"
-                           "<li><b>3D In-Vivo Array:</b> 楕円体の N x N x Z 多層グリッドを生成します。最も高い位置にある細胞を表面から沈めるための正確な<b>Depth In-Vivo (生体内深度)</b>を指定できます。</li>"
-                           "<li><b>均等 (Uniform) とランダム (Random):</b> 「均等」は完全な数学的格子を作成します。「ランダム」は、定義された「Random Radius (ランダム半径)」内で細胞を2次元または3次元空間で安全にシフトさせ、現実的で非理想化された生物学的分布をシミュレートします。アルゴリズムは、ランダムなシフトによって細胞の重複が発生したり、定義された組織の深さを超えたりしないよう厳密にチェックします。</li>"
-                           "</ul>"
+        "<h3>2. アレイの配置と間隔</h3>"
+        "<ul>"
+        "<li><b>2D In-Vitro アレイ:</b> ドーム型細胞の平坦な N x N グリッドを生成します。</li>"
+        "<li><b>3D In-Vivo アレイ:</b> 楕円体の N x N x Z 多層グリッドを生成します。<b>Z-Axis Layers (Z軸レイヤー)</b> で垂直方向の細胞層の数を定義し、<b>Z-Axis Spacing (µm) (Z軸間隔)</b> でそれらの間の垂直距離を設定します。また、最も高い位置にある細胞を表面から沈めるための正確な <b>Depth In-Vivo (生体内深度)</b> を指定できます。</li>"
+        "<li><b>均等 (Uniform) とランダム (Random):</b> 「均等」は完全な数学的格子を作成します。「ランダム」は、定義された「Random Radius (ランダム半径)」内で細胞を2次元または3次元空間で安全にシフトさせ、現実的で非理想化された生物学的分布をシミュレートします。アルゴリズムは、ランダムなシフトによって細胞の重複が発生したり、定義された組織の深さを超えたりしないよう厳密にチェックします。</li>"
+        "</ul>"
 
-                           "<h3>3. シミュレーションパラメータとスコアリング</h3>"
-                           "<ul>"
-                           "<li><b>マテリアル (Materials):</b> 各領域にマテリアル（物質）を割り当てます。CellMakerは、PHITSの <code>[ Material ]</code> セクション用のマテリアルIDを自動的に処理します。</li>"
-                           "<li><b>線源設定 (Source Configuration):</b> 粒子ビームを<b>点 (Point)</b>線源または<b>ディスク (Disk)</b>ビームとして定義します。<code>maxcas</code> および <code>maxbch</code> パラメータは、統計的ヒストリーの生成を制御します。</li>"
-                           "<li><b>タリー (出力):</b> チェックボックスを使用すると、ジオメトリの可視化 (<code>[ T - Gshow ]</code>)、粒子のトラッキング (<code>[ T - Track ]</code>)、および個々の細胞コンパートメント内の高精度な微視的線量付与 (<code>[ T - Deposit ]</code>) のためのカードが自動的に生成されます。</li>"
-                           "</ul>"
+        "<h3>3. シミュレーションパラメータとスコアリング</h3>"
+        "<ul>"
+        "<li><b>マテリアル (Materials):</b> 各領域にマテリアル（物質）を割り当てます。CellMakerは、PHITSの <code>[ Material ]</code> セクション用のマテリアルIDを自動的に処理します。</li>"
+        "<li><b>線源設定 (Source Configuration):</b> 粒子ビームを<b>点 (Point)</b>線源または<b>ディスク (Disk)</b>ビームとして定義します。<code>maxcas</code> および <code>maxbch</code> パラメータは、統計的ヒストリーの生成を制御します。</li>"
+        "<li><b>タリー (出力):</b> チェックボックスを使用すると、ジオメトリの可視化 (<code>[ T - Gshow ]</code>)、粒子のトラッキング (<code>[ T - Track ]</code>)、および個々の細胞コンパートメント内の高精度な微視的線量付与 (<code>[ T - Deposit ]</code>) のためのカードが自動的に生成されます。</li>"
+        "</ul>"
 
-                           "<h3>4. ワークフロー: プレビューから実行まで</h3>"
-                           "<ol>"
-                           "<li><b>生成 (Generate):</b> 数学モデルを処理し、2Dビューアで可視化します。</li>"
-                           "<li><b>確認 (Verify):</b> <b>XY (上面図)</b> で横方向の間隔を確認し、<b>XZ (側面図)</b> で垂直プロファイルとバッファの深さを確認します。</li>"
-                           "<li><b>エクスポート (Export):</b> 自動生成された <code>[ Surface ]</code> および <code>[ Cell ]</code> カードを含む <code>.inp</code> ファイルを作成します。</li>"
-                           "<li><b>実行 (Execute):</b> ユーティリティから直接ローカルのPHITS実行ファイルを起動し、輸送計算を開始します。</li>"
-                           "</ol>"
+        "<h3>4. ワークフロー: プレビューから実行まで</h3>"
+        "<ol>"
+        "<li><b>生成 (Generate):</b> 数学モデルを処理し、2Dビューアで可視化します。</li>"
+        "<li><b>確認 (Verify):</b> <b>XY (上面図)</b> で横方向の間隔を確認し、<b>XZ (側面図)</b> で垂直プロファイルとバッファの深さを確認します。</li>"
+        "<li><b>エクスポート (Export):</b> 自動生成された <code>[ Surface ]</code> および <code>[ Cell ]</code> カードを含む <code>.inp</code> ファイルを作成します。</li>"
+        "<li><b>実行 (Execute):</b> ユーティリティから直接ローカルのPHITS実行ファイルを起動し、輸送計算を開始します。</li>"
+        "</ol>"
 
-                           "<h3>重要な技術的注意事項</h3>"
-                           "<ul>"
-                           "<li><b>ジオメトリの検証:</b> ユーザーが定義したサイズや比率によって、核が大きすぎて細胞内に安全に収まらない場合、またはランダム配置において1000回の試行で重複を解消できない場合、シミュレーションの物理的整合性を保護するために生成が中断されます。</li>"
-                           "<li><b>単位:</b> すべての入力単位は<b>マイクロメートル (µm)</b>ですが、PHITSにエクスポートされる際に自動的に<b>センチメートル (cm)</b>に変換されます。</li>"
-                           "</ul>"
+        "<h3>重要な技術的注意事項</h3>"
+        "<ul>"
+        "<li><b>ジオメトリの検証:</b> ユーザーが定義したサイズや比率によって、核が大きすぎて細胞内に安全に収まらない場合、またはランダム配置において1000回の試行で重複を解消できない場合、シミュレーションの物理的整合性を保護するために生成が中断されます。</li>"
+        "<li><b>単位:</b> すべての入力単位は<b>マイクロメートル (µm)</b>ですが、PHITSにエクスポートされる際に自動的に<b>センチメートル (cm)</b>に変換されます。</li>"
+        "<li><b>PHIG-3D:</b> PHIG-3Dを使用して細胞ジオメトリを可視化する場合は、デフォルトの手法として<b>「Marching Cubes」</b>を選択してください。</li>"
+        "</ul>"
     };
-
 
     textBrowser->setHtml(english.content);
 
@@ -1412,4 +1516,20 @@ void cellmaker::on_actionRun_PHITS_triggered()
 void cellmaker::on_actionManual_triggered()
 {
     on_pushButton_8_clicked();
+}
+
+void cellmaker::on_comboBox_8_currentTextChanged(const QString &arg1)
+{
+    bool is3D = (arg1 == "3D (in-vivo)");
+
+    ui->label_ZCells->setVisible(is3D);
+
+    ui->lineEdit_ZCells->setVisible(is3D);
+
+    ui->label_PitchZ->setVisible(is3D);
+
+    ui->lineEdit_PitchZ->setVisible(is3D);
+
+
+    ui->label_3->setText(is3D ? "Depth In-Vivo (um):" : "Buffer Height (um):");
 }

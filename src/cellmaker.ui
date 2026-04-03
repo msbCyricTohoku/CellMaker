@@ -26,18 +26,8 @@
          <string>Cell Geometry</string>
         </property>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="7" column="1">
-          <widget class="QComboBox" name="comboBox"/>
-         </item>
-         <item row="3" column="1">
-          <widget class="QLineEdit" name="lineEdit_11"/>
-         </item>
-         <item row="8" column="0">
-          <widget class="QLabel" name="label_random_radius">
-           <property name="text">
-            <string>Random Radius (um):</string>
-           </property>
-          </widget>
+         <item row="9" column="1">
+          <widget class="QComboBox" name="comboBox_8"/>
          </item>
          <item row="6" column="0">
           <widget class="QLabel" name="label_6">
@@ -46,8 +36,15 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="lineEdit_10"/>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="lineEdit"/>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>2D In-Vitro/3D In-Vivo:</string>
+           </property>
+          </widget>
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="label_19">
@@ -56,39 +53,11 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
-          <widget class="QLineEdit" name="lineEdit_4"/>
+         <item row="7" column="1">
+          <widget class="QComboBox" name="comboBox"/>
          </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>Cell Distribution:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Buffer Medium (um):</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_9">
-           <property name="text">
-            <string>Cell Array Size (int):</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_18">
-           <property name="text">
-            <string>Nucleus Diameter (um):</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QLineEdit" name="lineEdit_3"/>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="lineEdit_11"/>
          </item>
          <item row="4" column="1">
           <widget class="QLineEdit" name="lineEdit_2"/>
@@ -100,8 +69,12 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_6"/>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Cell Distribution:</string>
+           </property>
+          </widget>
          </item>
          <item row="5" column="0">
           <widget class="QLabel" name="label_5">
@@ -110,9 +83,6 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="lineEdit"/>
-         </item>
          <item row="8" column="1">
           <widget class="QSpinBox" name="spinBoxRandomRadius">
            <property name="maximum">
@@ -120,6 +90,66 @@
            </property>
            <property name="value">
             <number>50</number>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QLineEdit" name="lineEdit_4"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Buffer Medium (um):</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEdit_5"/>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="lineEdit_10"/>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Cell Array Size (int):</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="1">
+          <widget class="QLineEdit" name="lineEdit_ZCells"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_18">
+           <property name="text">
+            <string>Nucleus Diameter (um):</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="lineEdit_3"/>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_random_radius">
+           <property name="text">
+            <string>Random Radius (um):</string>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="1">
+          <widget class="QLineEdit" name="lineEdit_PitchZ"/>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="label_ZCells">
+           <property name="text">
+            <string>Z-Axis Layers:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="0">
+          <widget class="QLabel" name="label_PitchZ">
+           <property name="text">
+            <string>Z-Axis Spacing (um):</string>
            </property>
           </widget>
          </item>
