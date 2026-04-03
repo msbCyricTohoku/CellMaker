@@ -31,7 +31,7 @@
   User Manual included in the program. 
 
   [WINDOWS EXE]
-  Please check `Releases` for Windows Executable.
+  Please check `Releases` for Windows Installer.
 
  =======================================================================
   (c) RARiS Nuclear Lab., Tohoku University, Japan. All rights reserved.
